@@ -58,9 +58,11 @@ pi_lprice = 0.5
 growth_rate = (1-exp(-5/(30)*t))
 #growth_rate=1
 inc_prmat =  1+p_rmb*pi_lprice*growth_rate
-df = data.frame(t,value=inc_prmat)
+df = data.frame(t,value=round(growth_rate,2))
+df
 write.gdx("data_battery.gdx",list(increase_price_rare_material=df), compress=F)
 ```
+
 
 
 
