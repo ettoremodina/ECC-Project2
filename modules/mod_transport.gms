@@ -412,7 +412,7 @@ K_EN.fx('battery',t,n) = 0;
 Q_EN.fx('battery',t,n) = 0;
 
 **newcode
-MCOST_INV.up('next_gen_battery',t,n)$(not tfix(t)) = next_gen_battery_cost(tfirst);
+*MCOST_INV.up('next_gen_battery',t,n)$(not tfix(t)) = next_gen_battery_cost(tfirst);
 
 MCOST_INV.up('battery',t,n)$(not tfix(t)) = battery_cost_new(tfirst,n);
 MCOST_INV.fx('battery',t,n)$((not tfix(t)) and (year(t) lt rd_time('battery','start'))) = battery_cost_new(t,n);

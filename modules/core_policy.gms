@@ -70,15 +70,13 @@ ctax(ghg,t,n) = 0;
 
 * Default emission cap
 e_cap(ghg) = yes;
-<<<<<<< HEAD:modules/core_policy.gms
+
 *emi_cap(t,n) = 500;
-=======
-*emi_cap(t,n)= 500;
+
 
 ***newcode
 emi_cap(t,n)$(not sameas(n,'usa')) = 500;
 ***
->>>>>>> f0b84fa69194023b50b7949c810cce9c164a1e64:witchmodel/modules/core_policy.gms
 
 $ifthen.pol %policy%=="bau"
 
