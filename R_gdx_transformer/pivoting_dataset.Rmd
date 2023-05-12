@@ -56,13 +56,11 @@ p_rmb = 0.1
 pi_lprice = 0.5
 
 growth_rate = (1-exp(-5/(30)*t))
-growth_rate=1
+#growth_rate=1
 inc_prmat =  1+p_rmb*pi_lprice*growth_rate
-papth_data="C:/Users/modin/Desktop/Ettore/UNIVERSITA/ECC_GAMS/ECC-Project/witchmodel/data_witch17"
 df = data.frame(t,value=inc_prmat)
-path_save_data = paste0(papth_data,"data_battery.gdx")
-write.gdx(path_save_data,list(increase_price_rare_material=df), compress=F)
- ```
+write.gdx("data_battery.gdx",list(increase_price_rare_material=df), compress=F)
+```
 
 
 
