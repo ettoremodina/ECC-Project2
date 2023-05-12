@@ -7,6 +7,7 @@ $ifthen %phase%=='conf'
 * Define the transport baseline
 $setglobal tra_baseline %baseline%
 
+*** newcode
 $setglobal perc_incr 0.5
 
 *-------------------------------------------------------------------------------
@@ -61,6 +62,9 @@ jveh_fed(jveh)=yes$(jfed(jveh));
 set el_out /
 edv
 /;
+
+*** newcode
+set n_wo_rare_mat(n) /'mexico','brazil'/
 
 *-------------------------------------------------------------------------------
 $elseif %phase%=='include_data'
@@ -272,7 +276,6 @@ parameter carshare(t,n);
 parameter 
     battery_cost_new(t,n);
 
-
 parameter perc_incr_price_lith  #setglobal
     pi_lprice /%perc_incr%/;  
 
@@ -295,7 +298,7 @@ $elseif %phase%=='compute_data'
 dec_inv(t,n) = 1;
 
 battery_cost_new(t,n) = battery_cost(t);
-battery_cost_new(t,n)$(sameas (n,'mexico')) = increase_price_rare_material(t)*battery_cost(t);
+battery_cost_new(t,n_wo_rare_mat) = (1+pi_lprice*increase_price_rare_material(t))*battery_cost(t);
 ***
 
 krd0('battery',n) = sum(nn,krd0('en',nn))*0.0141*0.076923077;
@@ -521,6 +524,7 @@ jveh_invfix
 * Parameters
 *** newcode
 battery_cost_new
+increase_price_rare_material
 
 ai
 battery_cost
