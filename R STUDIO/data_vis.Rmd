@@ -63,13 +63,13 @@ matlines(x,y_t1+100*exp(1/x))
 # Extract and combine data from different gdx
 ```{r}
 path <- "C:/Users/modin/Desktop/Ettore/UNIVERSITA/ECC_GAMS/witchmodel"
-#path <- "C:/Users/modin/Desktop/Ettore/UNIVERSITA/ECC_GAMS/RICE/RICE50x_v1_portable/results"
+
 
 files <- list.files(path,pattern = ".gdx")
 myfiles <- file.path(path, files)
 myfiles = myfiles %>% str_subset(pattern = "results.*\\.gdx")
 myfiles
-myfiles=myfiles[c(1,4,5)]
+myfiles=myfiles[c(1,2,5,6)]
 
 ```
 
@@ -77,7 +77,7 @@ myfiles=myfiles[c(1,4,5)]
 ```{r}
 tstep = 5
 first_year = 2000
-max_year = 2100
+max_year = 2150
 ```
 
 
@@ -120,7 +120,7 @@ res <- batch_extract(variable, files = myfiles)
 res = res[[variable]]
 res
 
-res = res[which( res$n %in% c("usa","europe","china")),]
+res = res[which( res$n %in% c("china","usa")),]
 res
 ```
 
@@ -144,9 +144,7 @@ data <- data %>% mutate(scen = factor(scen, levels = levs))
 
 
 ## group regiondata into worlddata
-if (v=="E"){
-  data <- data %>% group_by(scen,year) %>% summarise(value = sum(value))
-}
+#data <- data %>% group_by(scen,year) %>% summarise(value = sum(value))
 
 
 ggplot(data %>% filter(year <= max_year),
@@ -166,12 +164,11 @@ theme_bw() +
 theme(axis.text.x = element_text(angle = 45, hjust = 1))+
   
 scale_x_continuous(limits=c(first_year+tstep, max_year),
-                    breaks=seq(first_year+tstep, max_year,by = 5)) + 
+                    breaks=seq(first_year+tstep, max_year,by = 10)) +
   
 #scale_y_continuous(limits=c(-5, 50)) +
   
 scale_color_discrete(name = "Scenario")
-
 ```
 
 

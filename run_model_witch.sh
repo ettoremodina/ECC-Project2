@@ -1,5 +1,5 @@
 #!/bin/bash
-cd "C:/Users/modin/Desktop/Ettore/UNIVERSITA/ECC_GAMS/ECC-Project2"
+cd "C:/Users/modin/Desktop/Ettore/UNIVERSITA/ECC_GAMS/witchmodel"
 
 
 # This is to create a tider nameout 
@@ -18,7 +18,7 @@ done
 ## DON'T MODIFY
 for ((i=0 ; i < ${#arg[@]} ; ++i)) ; do
     echo ${arg[i]} --nameout=${name[i]} 
-    #C:/GAMS/42/gams run_witch.gms ${arg[i]} --nameout=${name[i]} 
+    C:/GAMS/42/gams run_witch.gms ${arg[i]} --nameout=${name[i]} 
 done
 
 # bash run_model_witch.sh
