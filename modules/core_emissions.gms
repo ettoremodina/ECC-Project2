@@ -119,9 +119,6 @@ eq_mkt_clearing_nip_%clt%
 *-------------------------------------------------------------------------------
 $elseif %phase%=='eqs'
 
-eqq_emi_lim_new_%clt%(t,n)$(mapn_th('%clt%') and t_cap(t,n) and (year(t) gt 2050) and (sameas(n,'usa')))..
-    sum(e_cap(e), Q_EMI(e,t,n)) =l= 0.01;
-
 
 * GHG emission cap
 eqq_emi_lim_%clt%(t,n)$(mapn_th('%clt%') and t_cap(t,n))..

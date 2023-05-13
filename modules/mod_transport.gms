@@ -385,7 +385,7 @@ ELMOTOR_COST.fx(t) $(year(t) ge 2050) = 23 ;
 
 
 *** newcode 
-I_EN.up('trad_cars',t,'europe')$(year(t) ge 2035) = 1e-6;
+I_EN.up('trad_cars',t,'europe')$(year(t) ge 2035) = 1e-4;
 ****
 
 

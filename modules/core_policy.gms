@@ -100,22 +100,11 @@ $else.cg
 $endif.cg
 ;
 
-<<<<<<< HEAD:modules/core_policy.gms
-
-
-*** newcode: netzero usa and eu in 2050.
-
-emi_cap(t,n)$(not sameas (n,'usa')) = 100; # very high number
-emi_cap(t,'usa')$(year(t) ge 2050) = 0.001;
-
-
-=======
 *emi_cap(t,n) = 100; # very high number
 
 *** newcode: netzero usa and eu in 2050.
 emi_cap(t,'usa')$(year(t) ge 2050) = 0.001;
 emi_cap(t,'europe')$(year(t) ge 2050) = 0.001;
->>>>>>> f0b84fa69194023b50b7949c810cce9c164a1e64:witchmodel/modules/core_policy.gms
 ***
 
 $endif.pol
