@@ -31,15 +31,17 @@ write.gdx("data_mod_lithium.gdx",list(trade_poly_lit=mod_lit), compress=F)
 
 ```{r}
 path <- "C:/Users/modin/Desktop/Ettore/UNIVERSITA/ECC_GAMS/ECC-Project/witchmodel/modules"
-
 files <- list.files(path,pattern = ".gdx")
 myfiles <- file.path(path, files)
 myfiles = myfiles %>% str_subset(pattern = "results.*\\.gdx")
 dataset <- read.csv(file="curve2.csv")
 head(dataset)
 
+
 head(dataset)
 colnames(dataset)<-c("X","n","deg0","deg4")
+
+n = unique(dataset$Region)
 
 dataset<- dataset[,2:4] %>% pivot_longer(cols=!n)
 head(dataset)
@@ -60,9 +62,45 @@ growth_rate = (1-exp(-5/(30)*t))
 inc_prmat =  1+p_rmb*pi_lprice*growth_rate
 df = data.frame(t,value=round(growth_rate,2))
 df
-write.gdx("data_battery.gdx",list(increase_price_rare_material=df), compress=F)
+gdxdata=write.gdx("data_battery.gdx",list(increase_price_rare_material=df), compress=F)
+mygdx  =gdx("data_battery.gdx")
 ```
 
+```{r}
+no_lit <- c("canada","jpnkor","mexico","india","indonesia","mena","sasia","seasia","te")
+lit = setdiff(no_lit, all)
+no_lit_maybe <- c("europe", "usa", "brazil", "ssa")
+no_cob <- c("europe", "jpnkor", "mexico", "usa", "brazil", "india", "indonesia", "sasia")
+no_cob_maybe = "laca"
+cob = setdiff(no_cob, all)
+lit_cob <- c("oceania", "china", "southafrica")
 
+all <- unique(c(no_lit, lit, no_lit_maybe, no_cob, lit_cob, no_cob_maybe))
+sort(all)
+
+#is_included <- setdiff(as.vector(countrys$V1), all)
+
+countrys <- unique(c(no_lit, no_lit_maybe, no_cob, no_cob_maybe, lit_cob))
+df <- data.frame(
+  n = countrys,
+  no_lit = as.numeric(countrys %in% no_lit),
+  no_lit_maybe = as.numeric(countrys %in% no_lit_maybe),
+  no_cob = as.numeric(countrys %in% no_cob),
+  no_cob_maybe = as.numeric(countrys %in% no_cob_maybe),
+  lit_cob = as.numeric(countrys %in% lit_cob)
+)
+
+df
+#dataset <- df %>% pivot_longer(cols = !n)
+dataset
+colnames(dataset) <- c("n", "", "Value")
+write.gdx("data_materials.gdx", list(materials = dataset), compress = FALSE)
+
+# crea dataframe con i valori moltiplicativi
+# ogni nazione troverà il suo fattore moltiplicativo di prezzo
+increment <- c(0.5, 0.3, 0.1, 0.6, 1)
+binary <- dataset[dataset$n == "canada", 3]$Value
+val <- sum(increment * binary)
+```
 
 

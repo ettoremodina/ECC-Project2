@@ -8,7 +8,7 @@ $ifthen %phase%=='conf'
 $setglobal tra_baseline %baseline%
 
 *** newcode
-$setglobal perc_incr 0.5
+$setglobal perc_incr 2
 
 *-------------------------------------------------------------------------------
 $elseif %phase%=='sets'
@@ -64,7 +64,7 @@ edv
 /;
 
 *** newcode
-set n_wo_rare_mat(n) /'mexico','brazil'/
+set n_w_rare_mat(n) /oceania, china, southafrica/
 
 *-------------------------------------------------------------------------------
 $elseif %phase%=='include_data'
@@ -286,6 +286,7 @@ parameter
 
 
 $gdxin '%datapath%data_battery.gdx'
+*increasing function [0,30]->[0,1)
 parameter increase_price_rare_material(t);
 $loaddc increase_price_rare_material
 $gdxin
@@ -297,8 +298,8 @@ $elseif %phase%=='compute_data'
 *** new code
 dec_inv(t,n) = 1;
 
-battery_cost_new(t,n) = battery_cost(t);
-battery_cost_new(t,n_wo_rare_mat) = (1+pi_lprice*increase_price_rare_material(t))*battery_cost(t);
+battery_cost_new(t,n) = (1+pi_lprice*increase_price_rare_material(t))*battery_cost(t);
+battery_cost_new(t,n_w_rare_mat) = battery_cost(t);
 ***
 
 krd0('battery',n) = sum(nn,krd0('en',nn))*0.0141*0.076923077;
@@ -384,7 +385,7 @@ ELMOTOR_COST.fx(t) $(year(t) ge 2050) = 23 ;
 
 
 *** newcode 
-I_EN.up('trad_cars',t,'europe')$(year(t) ge 2035) = 0.1;
+I_EN.up('trad_cars',t,'europe')$(year(t) ge 2035) = 1e-6;
 ****
 
 
@@ -443,7 +444,7 @@ $elseif %phase%=='eqs'
 
 *** newcode
 eqq_inv_red_ban_%clt%(t,n)$(mapn_th('%clt%'))..
-    I_EN('trad_cars',t,n)$(year(t) ge 2025) =l= dec_inv(t,n)*I_EN('trad_cars',t-1,n)$(year(t) ge 2025);
+    I_EN('trad_cars',t,'usa')$(year(t) ge 2035) =l= 0.75*I_EN('trad_cars','6','usa');
 
 ***
 *- Number of light duty vehicles

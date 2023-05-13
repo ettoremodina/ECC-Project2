@@ -62,80 +62,117 @@ matlines(x,y_t1+100*exp(1/x))
 ```
 # Extract and combine data from different gdx
 ```{r}
-path <- "C:/Users/modin/Desktop/Ettore/UNIVERSITA/ECC_GAMS/ECC-Project/witchmodel"
+path <- "C:/Users/modin/Desktop/Ettore/UNIVERSITA/ECC_GAMS/witchmodel"
 #path <- "C:/Users/modin/Desktop/Ettore/UNIVERSITA/ECC_GAMS/RICE/RICE50x_v1_portable/results"
 
 files <- list.files(path,pattern = ".gdx")
 myfiles <- file.path(path, files)
 myfiles = myfiles %>% str_subset(pattern = "results.*\\.gdx")
 myfiles
-#myfiles=myfiles[1]
+myfiles=myfiles[c(1,4,5)]
 
 ```
 
-# choose variable of interest, multiple variables is still buggy
+# TIME
 ```{r}
-variables = c("battery_cost_new")
 tstep = 5
 first_year = 2000
 max_year = 2100
-res <- batch_extract(variables, files = myfiles[1]) # load GHG emissions
 ```
 
 
 ```{r}
-v = variables # rename for semplicity
-#for (v in variables){
-  data= res[[v]] %>% as_tibble()
-  
-  data <- data %>%
-    # Transform time period into year, t0 and tsep could be different
-  mutate(year = as.numeric(t) * tstep + first_year) %>% 
-  # Transform the filename into a scenario name
-  ## would be cool to subdivide each sub scenario indipendently but don't know if it's even worth it
-  ## NB: save different analysis in different folders
-  mutate(scen = basename(gdx)) %>% 
-  mutate(scen = str_replace(scen, ".gdx", "")) %>%
-  mutate(scen = str_replace(scen, "results_", ""))
-  
-  levs = unique(data$scen)
-  data <- data %>% mutate(scen = factor(scen, levels = levs))
-  
-  
-  ## group regiondata into worlddata
-  if (v=="E"){
-    data <- data %>% group_by(scen,year) %>% summarise(value = sum(value))
-  }
-  
-  
-  ggplot(data %>% filter(year <= max_year),
-        aes(x = year, y = value, color = scen)) +
-    
-  geom_line() +
-    
-  #facet_wrap(~fuel, ncol = 3, scales='free') +
-    
-  geom_point() + # NEW GEOMETRY, SAME DATA AND MAPPING
-    
-  geom_hline(yintercept = 0, color = 'Black', size = 0.8) +
-    
-  labs(x = "", y = v, title = v) +
-    
-  theme_bw() +
-    
-  scale_x_continuous(limits=c(first_year+tstep, max_year),
-                      breaks=seq(first_year+tstep, max_year,by = 5), # Define the axis tiks breaks
-                      guide = guide_axis(n.dodge = 2)) + # avoid overlapping
-    
-  #scale_y_continuous(limits=c(-5, 50)) +
-    
-  scale_color_discrete(name = "Scenario")
+variable = c("I_EN")
+res <- batch_extract(variable, files = myfiles) 
+res = res[[variable]]
+res
 
-#}
+res = res[which(res$jinv == "trad_cars" & res$n %in% c("usa","europe","china")),]
+```
+```{r}
+variable = c("K_EN")
+res <- batch_extract(variable, files = myfiles) 
+res = res[[variable]]
+res
 
-
+res = res[which(res$jreal == "battery" & res$n %in% c("usa","europe","china")),]
+res
 ```
 
+
+```{r}
+variable = c("MCOST_INV")
+res <- batch_extract(variable, files = myfiles) 
+res = res[[variable]]
+res
+
+res = res[which(res$jreal == "battery" & res$n %in% c("usa","europe","china")),]
+res
+```
+
+
+
+# battery cost
+```{r}
+variable = c("battery_cost_new")
+
+res <- batch_extract(variable, files = myfiles) 
+res = res[[variable]]
+res
+
+res = res[which( res$n %in% c("usa","europe","china")),]
+res
+```
+
+```{r}
+v = variable # rename for semplicity
+
+data = res %>% as_tibble()
+
+data <- data %>%
+# Transform time period into year, t0 and tsep could be different
+mutate(year = as.numeric(t) * tstep + first_year) %>% 
+# Transform the filename into a scenario name
+## would be cool to subdivide each sub scenario indipendently but don't know if it's even worth it
+## NB: save different analysis in different folders
+mutate(scen = basename(gdx)) %>% 
+mutate(scen = str_replace(scen, ".gdx", "")) %>%
+mutate(scen = str_replace(scen, "results_", ""))
+
+levs = unique(data$scen)
+data <- data %>% mutate(scen = factor(scen, levels = levs))
+
+
+## group regiondata into worlddata
+if (v=="E"){
+  data <- data %>% group_by(scen,year) %>% summarise(value = sum(value))
+}
+
+
+ggplot(data %>% filter(year <= max_year),
+      aes(x = year, y = value, color = scen)) +
+  
+geom_line() +
+  
+facet_wrap(~n, ncol = 3, scales='free') +
+  
+geom_point() + # NEW GEOMETRY, SAME DATA AND MAPPING
+  
+#geom_hline(yintercept = 0, color = 'Black', size = 0.8) +
+  
+labs(x = "", y = v, title = v) +
+  
+theme_bw() +
+theme(axis.text.x = element_text(angle = 45, hjust = 1))+
+  
+scale_x_continuous(limits=c(first_year+tstep, max_year),
+                    breaks=seq(first_year+tstep, max_year,by = 5)) + 
+  
+#scale_y_continuous(limits=c(-5, 50)) +
+  
+scale_color_discrete(name = "Scenario")
+
+```
 
 
 

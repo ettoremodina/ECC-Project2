@@ -51,7 +51,7 @@ plot(temp_usa,lwd=2,type = "l")
 
 ```{r}
 mygdx["n"][[1]]
-mygdx["n"]
+countrys = mygdx["n"]
 ```
 
 ### To get a data.frame of the parameter wemi:
@@ -66,6 +66,7 @@ mygdx["wemi"] %>% as_tibble() # removes row names and each colum is a list?
 ```{r}
 print(attr(mygdx["wemi"],"gams"))
 ```
+
 
 ### to get a data.frame of the variable Q_EMI (its level by default)
 
@@ -221,7 +222,7 @@ scale_color_viridis(discrete = TRUE, option = "D") # use "?" to check the option
 ### plots-load more data
 
 ```{r}
-pop <- batch_extract("l",files = myfiles)[[1]] %>% as_tibble() # Load population
+pop <- batch_extract(files = myfiles)[[1]] %>% as_tibble() # Load population
 # let's transform time periods into Years
 pop <- pop %>%
   mutate(year = as.numeric(t) * 5 + 2000) %>% # Transform time period into year
