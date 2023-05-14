@@ -57,6 +57,11 @@ $elseif %phase%=='include_data'
 parameter ctax(ghg,t,n) 'Carbon tax [T$/GTonC]';
 
 *-------------------------------------------------------------------------------
+*$elseif %phase%=='vars'
+
+*parameter emi_cap(t,n);
+
+*-------------------------------------------------------------------------------
 $elseif %phase%=='policy'
 
 * Initialization
@@ -71,12 +76,8 @@ ctax(ghg,t,n) = 0;
 * Default emission cap
 e_cap(ghg) = yes;
 
-
-
-
-***newcode
 *emi_cap(t,n) = 500;
-***
+
 
 $ifthen.pol %policy%=="bau"
 
@@ -103,14 +104,16 @@ $endif.cg
 
 *** newcode: netzero usa and eu in 2050.
 
+***newcode
 emi_cap(t,n) = 100;
 *emi_cap(t,n)$(not sameas(n,'usa')) = 100;
 emi_cap(t,'usa')$(year(t) ge 2050) = 0.001;
+
 ***
 
 $endif.pol
 
-*--------------------------------------------
+*------------
 $elseif %phase%=='eql'
 
 ***newcode
