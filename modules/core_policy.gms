@@ -95,6 +95,7 @@ $endif.cg
 ;
 
 emi_cap(t,n) = 100; # very high number
+emi_cap(t,n)$(year(t) gt 2050 and sameas(n,'europe')) = 0; # very high number
 
 $endif.pol
 

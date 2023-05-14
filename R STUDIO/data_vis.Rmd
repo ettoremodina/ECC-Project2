@@ -198,6 +198,7 @@ scale_x_continuous(limits=c(first_year+tstep, max_year),
 #scale_color_discrete(name = "Scenario")
 scale_color_viridis(name = "Scenario",discrete = TRUE, option = "D")
 ```
+<<<<<<< Updated upstream
 ```{r}
 mutate(scen = basename(gdx)) %>% 
 mutate(scen = str_replace(scen, ".gdx", "")) %>%

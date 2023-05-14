@@ -79,7 +79,7 @@ mygdx["Q_EMI",field = "up"] %>% as_tibble()
 ### To load many gdx at once in one data.frame, use the function batch_extract
 
 ```{r}
-myfiles = file.path('C:/Users/modin/Desktop/Ettore/UNIVERSITA/ECC_GAMS/R STUDIO',c("results_ssp2_bau.gdx","results_ssp2_ctax50.gdx"))
+myfiles = file.path('./',c("results_ssp2_bau.gdx","results_ssp2_ctax50.gdx"))
 qemi = batch_extract("Q_EMI",files = myfiles)[[1]]
 qemi %>% as_tibble()
 #mygdx["TEMP"]$value
@@ -138,7 +138,7 @@ p
 
 ```{r}
 # read several GDX (several scenarios with different carbon taxes)
-myfiles <- file.path("C:/Users/modin/Desktop/Ettore/UNIVERSITA/ECC_GAMS/R STUDIO", c("results_ssp2_bau.gdx","results_ssp2_ctax50.gdx","results_ssp2_ctax100.gdx"))
+myfiles <- file.path("./", c("results_ssp2_bau.gdx","results_ssp2_ctax50.gdx","results_ssp2_ctax100.gdx"))
 res <- batch_extract("Q_EMI", files = myfiles) # load GHG emissions
 # have a look at the structure
 str(res) # a list of a data frame
@@ -148,8 +148,8 @@ qemi = res$Q_EMI %>% as_tibble()
 # The element in a list can also be accessed with res[[1]] or res[['Q_EMI']]
 qemi
 
-qemi_brazil = qemi[which(qemi$n=="brazil"),]
-qemi_brazil
+#qemi_brazil = qemi[which(qemi$n=="brazil"),]
+#qemi_brazil
 
 ```
 
@@ -222,7 +222,7 @@ scale_color_viridis(discrete = TRUE, option = "D") # use "?" to check the option
 ### plots-load more data
 
 ```{r}
-pop <- batch_extract(files = myfiles)[[1]] %>% as_tibble() # Load population
+pop <- batch_extract("l",files = myfiles)[[1]] %>% as_tibble() # Load population
 # let's transform time periods into Years
 pop <- pop %>%
   mutate(year = as.numeric(t) * 5 + 2000) %>% # Transform time period into year
