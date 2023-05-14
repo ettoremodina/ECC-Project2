@@ -57,11 +57,6 @@ $elseif %phase%=='include_data'
 parameter ctax(ghg,t,n) 'Carbon tax [T$/GTonC]';
 
 *-------------------------------------------------------------------------------
-*$elseif %phase%=='vars'
-
-*parameter emi_cap(t,n);
-
-*-------------------------------------------------------------------------------
 $elseif %phase%=='policy'
 
 * Initialization
@@ -75,9 +70,7 @@ ctax(ghg,t,n) = 0;
 
 * Default emission cap
 e_cap(ghg) = yes;
-
-*emi_cap(t,n) = 500;
-
+emi_cap(t,n) = 500;
 
 $ifthen.pol %policy%=="bau"
 
@@ -101,33 +94,9 @@ $else.cg
 $endif.cg
 ;
 
-
-*** newcode: netzero usa and eu in 2050.
-
-***newcode
-emi_cap(t,n) = 100;
-*emi_cap(t,n)$(not sameas(n,'usa')) = 100;
-emi_cap(t,'usa')$(year(t) ge 2050) = 0.001;
-
-***
+emi_cap(t,n) = 100; # very high number
 
 $endif.pol
-
-*------------------------------------------------
-$elseif %phase%=='eql'
-
-***newcode
-eqq_emi_lim_new_%clt%
-***
-
-*-------------------------------------------------------------------------------
-$elseif %phase%=='eqs'
-
-***new code
-eqq_emi_lim_new_%clt%(t,n)$(mapn_th('%clt%') and t_cap(t,n) and (year(t) gt 2050) and (sameas(n,'usa')))..
-    sum(e_cap(e), Q_EMI(e,t,n)) =l= emi_cap(t,n);
-***
-
 
 *-------------------------------------------------------------------------------
 $elseif %phase%=='before_nashloop'
