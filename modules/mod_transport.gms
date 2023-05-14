@@ -262,8 +262,7 @@ plg_hybrid      1
 edv             1
 /;
 
-parameter battery_cost(t) 'Historical (2005-2015) and then upper bound battery cost [US$2005/kWh]';
-$loaddc battery_cost
+
 
 $gdxin
 
@@ -289,6 +288,12 @@ $gdxin '%datapath%data_battery.gdx'
 *increasing function [0,30]->[0,1)
 parameter increase_price_rare_material(t);
 $loaddc increase_price_rare_material
+$gdxin
+
+$gdxin '%datapath%data_battery_updated.gdx'
+*updated the battery_cost
+parameter battery_cost(t); 
+$loaddc battery_cost
 $gdxin
 
 ***
@@ -385,7 +390,7 @@ ELMOTOR_COST.fx(t) $(year(t) ge 2050) = 23 ;
 
 
 *** newcode 
-I_EN.up('trad_cars',t,'europe')$(year(t) ge 2035) = 1e-4;
+I_EN.up('trad_cars',t,'europe')$(year(t) ge 2035) = 1e-2;
 ****
 
 

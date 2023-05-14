@@ -135,7 +135,9 @@ res
 res = res[res$V1=="battery",]
 gdxs = unique(res$gdx)
 data_diff = res[res$gdx==gdxs[2],"value"]-res[res$gdx==gdxs[1],"value"]
+data_perc = data_diff/res[res$gdx==gdxs[1],"value"]
 plot(data_diff,type="b",pch=16)
+plot(data_perc,type="b",pch=16)
 ```
 
 ```{r}
