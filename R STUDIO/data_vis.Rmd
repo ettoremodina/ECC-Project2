@@ -63,13 +63,13 @@ matlines(x,y_t1+100*exp(1/x))
 # Extract and combine data from different gdx
 ```{r}
 path <- "C:/Users/modin/Desktop/Ettore/UNIVERSITA/ECC_GAMS/witchmodel"
-
+#path <- "/Users/MICHELE/Documents/GitHub/ECC-Project2/results"
 
 files <- list.files(path,pattern = ".gdx")
 myfiles <- file.path(path, files)
 myfiles = myfiles %>% str_subset(pattern = "results.*\\.gdx")
 myfiles
-myfiles=myfiles[c(2,5)]
+myfiles=myfiles[c(5,6)]
 
 ```
 
@@ -167,8 +167,8 @@ ggplot(data %>% filter(year <= max_year),
       aes(x = year, y = value, color = scen)) +
   
 geom_line() +
-
-#facet_wrap(~n, ncol = 3, scales='free') +
+  
+facet_wrap(~n, ncol = 3, scales='free') +
   
 geom_point() + # NEW GEOMETRY, SAME DATA AND MAPPING
 
@@ -186,9 +186,54 @@ scale_x_continuous(limits=c(first_year+tstep, max_year),
   
 scale_color_discrete(name = "Scenario")
 ```
+# area between curves
+```{r}
+variable = c("Q_EMI")
+res <- batch_extract(variable, files = myfiles) 
+res = res[[variable]]
+res
+
+res = res[which(res$e == "co2" & res$n %in% c("europe")),]
+```
 
 
+```{r}
+v = variable # rename for semplicity
 
+data = res %>% as_tibble()
 
+data <- data %>%
+# Transform time period into year, t0 and tsep could be different
+mutate(year = as.numeric(t) * tstep + first_year) %>% 
+# Transform the filename into a scenario name
+mutate(scen = basename(gdx)) %>% 
+mutate(scen = str_replace(scen, ".gdx", "")) %>%
+mutate(scen = str_replace(scen, "results_", ""))
 
+levs = unique(data$scen)
+data <- data %>% mutate(scen = factor(scen, levels = levs))
 
+## group regiondata into worlddata
+#data <- data %>% group_by(scen,year) %>% summarise(value = sum(value))
+
+y_up <- data[data$scen=='ssp2_bau',]$value  
+y_low <- data[data$scen=='ssp2_ctax',]$value
+x <- data$year[1:30]
+
+df_combined <- data.frame(x, y_up, y_low)
+
+# Create the plot
+ggplot() +
+  geom_ribbon(data = df_combined, aes(x = x, ymin = y_low, ymax = y_up), 
+              fill = "blue", alpha = 0.3) +
+  geom_line(data = df_combined, aes(x = x, y = y_up), color = "red") +
+  geom_line(data = df_combined, aes(x = x, y = y_low), color = "green") +
+  geom_point() + # NEW GEOMETRY, SAME DATA AND MAPPING
+  labs(x = "", y = v, title = v) +
+  #theme_bw() +
+  #theme(axis.text.x = element_text(angle = 45, hjust = 1))+
+  scale_x_continuous(limits=c(first_year+tstep, max_year),
+                    breaks=seq(first_year+tstep, max_year,by = 10)) +
+  scale_color_manual(values = c("red", "green"), labels = c("ssp2_bau", "ssp2_ctax")) +
+  theme(legend.position = "right")
+```
