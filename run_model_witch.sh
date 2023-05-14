@@ -1,16 +1,16 @@
 #!/bin/bash
-cd "C:/Users/modin/Desktop/Ettore/UNIVERSITA/ECC_GAMS/witchmodel"
+cd "C:/Users/asus/Documents/GitHub/witchmodel"
 
 
 # This is to create a tider nameout 
 name=()
-for c in nperc_incr_{3,3.5,4}  ; do
+for c in nperc_incr_{4,5,6,7}  ; do
     name+=($c)
 done
 
 # this is to launch the different flags
 arg=()
-for c in  --nperc_incr={3,3.5,4}; do
+for c in  --nperc_incr={4,5,6,7}; do
     arg+=($c)
 done
 
