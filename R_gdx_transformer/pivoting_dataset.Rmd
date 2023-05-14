@@ -51,6 +51,19 @@ head(mod_lit)
 #write.gdx("data_battery.gdx",list(increase_price_rare_material=df), compress=F)
 ```
 
+# battery cost override
+```{r}
+t = seq(1,30)
+b0 = 803.48
+bf = 90
+
+battery_cost = round((b0-bf)*exp(-5/3*(t-1))+bf,2)
+battery_cost = data.frame(t=t,value=battery_cost)
+
+ggplot(battery_cost,aes(x=t,y=battery_cost_),type="b",pch = 16)+ geom_line() 
+
+write.gdx("data_battery_updated.gdx", list(battery_cost = battery_cost), compress = FALSE)
+```
 
 ```{r}
 t = seq(1,30)
