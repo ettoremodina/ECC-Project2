@@ -27,12 +27,26 @@ library(RColorBrewer) # wide choice
 library(countrycode) # Country name tools
 
 ```
-```{r}
-lith = c(1.426024955,2.200011901,3.252693262,3.94243512,4.585833428,3.749943315,3.645069268,3.683428751,3.900433516,3.78042719,4.12688361,7.02276395,9.358695741,11.09685768,8.432977442,4.993804561,7.561162264)
 
-cost_lith = c(7.807486631,12.04506516,17.80849561,21.58483228,25.10743802,20.53093965,19.95675424,20.16677241,21.3548735,20.69783887,22.59468776,38.44963262,51.23885918,60.75529578,46.1705515,27.34107997,41.39736339)
-x = seq(2005,2021)
-plot(x,lith,pch = 16)
+# Extract and combine data from different gdx
+```{r}
+path <- "../../witchmodel"
+
+
+files <- list.files(path,pattern = ".gdx")
+myfiles <- file.path(path, files)
+myfiles = myfiles %>% str_subset(pattern = "results.*\\.gdx")
+myfiles
+myfiles=myfiles[c(2,5,6)]
+myfiles
+
+```
+
+# TIME
+```{r}
+tstep = 5
+first_year = 2000
+max_year = 2150
 ```
 
 # battery cost
@@ -60,27 +74,8 @@ matlines(x,y_t1+100*exp(1/x))
 #points(x,y_t1-b/log(x),col = "gold",pch = 16)
 
 ```
-# Extract and combine data from different gdx
-```{r}
-path <- "C:/Users/modin/Desktop/Ettore/UNIVERSITA/ECC_GAMS/witchmodel"
-#path <- "/Users/MICHELE/Documents/GitHub/ECC-Project2/results"
 
-files <- list.files(path,pattern = ".gdx")
-myfiles <- file.path(path, files)
-myfiles = myfiles %>% str_subset(pattern = "results.*\\.gdx")
-myfiles
-myfiles=myfiles[c(5,6)]
-
-```
-
-# TIME
-```{r}
-tstep = 5
-first_year = 2000
-max_year = 2150
-```
-
-
+#I_EN
 ```{r}
 variable = c("I_EN")
 res <- batch_extract(variable, files = myfiles) 
@@ -89,6 +84,8 @@ res
 
 res = res[which(res$jinv == "trad_cars" & res$n %in% c("usa","europe","china")),]
 ```
+
+#K_EN
 ```{r}
 variable = c("K_EN")
 res <- batch_extract(variable, files = myfiles) 
@@ -98,6 +95,20 @@ res
 res = res[which(res$jreal == "battery" & res$n %in% c("usa","europe","china")),]
 res
 ```
+
+#UTILITY
+```{r}
+variable = c("UTILITY")
+res <- batch_extract(variable, files = myfiles) 
+res = res[[variable]]
+res
+
+base = 1
+new = 3
+paste0(round((1-res$value[base]/res$value[new])*100,2),"%")
+
+```
+
 
 
 ```{r}
@@ -120,7 +131,7 @@ res <- batch_extract(variable, files = myfiles)
 res = res[[variable]]
 res
 
-res = res[which( res$n %in% c("china","usa")),]
+#res = res[which( res$n %in% c("china","usa")),]
 
 ```
 
@@ -167,8 +178,8 @@ ggplot(data %>% filter(year <= max_year),
       aes(x = year, y = value, color = scen)) +
   
 geom_line() +
-  
-facet_wrap(~n, ncol = 3, scales='free') +
+
+#facet_wrap(~n, ncol = 3, scales='free') +
   
 geom_point() + # NEW GEOMETRY, SAME DATA AND MAPPING
 
@@ -184,44 +195,21 @@ scale_x_continuous(limits=c(first_year+tstep, max_year),
   
 #scale_y_continuous(limits=c(-5, 50)) +
   
-scale_color_discrete(name = "Scenario")
+#scale_color_discrete(name = "Scenario")
+scale_color_viridis(name = "Scenario",discrete = TRUE, option = "D")
 ```
-# area between curves
 ```{r}
-variable = c("Q_EMI")
-res <- batch_extract(variable, files = myfiles) 
-res = res[[variable]]
-res
-
-res = res[which(res$e == "co2" & res$n %in% c("europe")),]
-```
-
-
-```{r}
-v = variable # rename for semplicity
-
-data = res %>% as_tibble()
-
-data <- data %>%
-# Transform time period into year, t0 and tsep could be different
-mutate(year = as.numeric(t) * tstep + first_year) %>% 
-# Transform the filename into a scenario name
 mutate(scen = basename(gdx)) %>% 
 mutate(scen = str_replace(scen, ".gdx", "")) %>%
 mutate(scen = str_replace(scen, "results_", ""))
-
 levs = unique(data$scen)
 data <- data %>% mutate(scen = factor(scen, levels = levs))
-
 ## group regiondata into worlddata
 #data <- data %>% group_by(scen,year) %>% summarise(value = sum(value))
-
 y_up <- data[data$scen=='ssp2_bau',]$value  
 y_low <- data[data$scen=='ssp2_ctax',]$value
 x <- data$year[1:30]
-
 df_combined <- data.frame(x, y_up, y_low)
-
 # Create the plot
 ggplot() +
   geom_ribbon(data = df_combined, aes(x = x, ymin = y_low, ymax = y_up), 
@@ -237,3 +225,85 @@ ggplot() +
   scale_color_manual(values = c("red", "green"), labels = c("ssp2_bau", "ssp2_ctax")) +
   theme(legend.position = "right")
 ```
+# area between curves
+```{r}
+variable = c("Q_EMI")
+res <- batch_extract(variable, files = myfiles) 
+res = res[[variable]]
+res
+res = res[which(res$e == "co2" & res$n %in% c("europe")),]
+```
+```{r}
+v = variable # rename for semplicity
+data = res %>% as_tibble()
+data <- data %>%
+# Transform time period into year, t0 and tsep could be different
+mutate(year = as.numeric(t) * tstep + first_year) %>% 
+# Transform the filename into a scenario name
+mutate(scen = basename(gdx)) %>% 
+mutate(scen = str_replace(scen, ".gdx", "")) %>%
+mutate(scen = str_replace(scen, "results_", ""))
+levs = unique(data$scen)
+data <- data %>% mutate(scen = factor(scen, levels = levs))
+## group regiondata into worlddata
+#data <- data %>% group_by(scen,year) %>% summarise(value = sum(value))
+y_up <- data[data$scen=='ssp2_bau',]$value  
+y_low <- data[data$scen=='ssp2_ctax',]$value
+x <- data$year[1:30]
+df_combined <- data.frame(x, y_up, y_low)
+# Create the plot
+ggplot() +
+  geom_ribbon(data = df_combined, aes(x = x, ymin = y_low, ymax = y_up), 
+              fill = "blue", alpha = 0.3) +
+  geom_line(data = df_combined, aes(x = x, y = y_up), color = "red") +
+  geom_line(data = df_combined, aes(x = x, y = y_low), color = "green") +
+  geom_point() + # NEW GEOMETRY, SAME DATA AND MAPPING
+  labs(x = "", y = v, title = v) +
+  #theme_bw() +
+  #theme(axis.text.x = element_text(angle = 45, hjust = 1))+
+  scale_x_continuous(limits=c(first_year+tstep, max_year),
+                    breaks=seq(first_year+tstep, max_year,by = 10)) +
+  scale_color_manual(values = c("red", "green"), labels = c("ssp2_bau", "ssp2_ctax")) +
+  theme(legend.position = "right")
+```
+
+
+# world visual
+```{r}
+# import the WITCH model regional definition
+wreg <- read_csv('mapwitch17.csv')
+# transforms ISO codes into country names
+wreg <- wreg %>% mutate(region = countrycode(ISO, origin = 'iso3c', destination = 'country.name'))
+# Correcting some mismatches
+#wreg[ISO ='GBR']$region = 'UK'
+#wreg[ISO ='USA']$region = 'USA'
+wreg
+
+world <- ne_countries(scale = "small", returnclass = "sf")
+world <- subset(world,!adm0_a3 %in% c("ATA","FJI"))
+# merge the WITCH regional definition with the world map
+world <- merge(world,wreg, by.x = "adm0_a3", by.y = "ISO")
+
+
+
+# merge with the emission data.frame
+world0 <- merge(world,res %>% filter(t == 30), by = "n", allow.cartesian=TRUE)
+# Use a better projection 'equal projection'
+target_crs <- '+proj=eqearth +wktext'
+world1 <- st_transform(world0, crs = target_crs)
+
+ggplot(data = world1) +
+  
+geom_sf(aes(fill = value)) +
+  
+coord_sf(datum = target_crs, expand = FALSE, clip = "off") +
+  
+scale_fill_distiller(name = "CO2 emission\nreduction\n[GtCO2]",
+                     palette ="RdYlGn", direction = -1) +
+theme_void()
+```
+
+
+
+
+
