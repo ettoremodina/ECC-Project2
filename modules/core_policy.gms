@@ -100,6 +100,7 @@ $else.cg
 $endif.cg
 ;
 
+
 *emi_cap(t,n) = 100; # very high number
 
 *** newcode: netzero usa and eu in 2050.
