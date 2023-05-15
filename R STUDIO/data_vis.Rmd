@@ -37,7 +37,7 @@ files <- list.files(path,pattern = ".gdx")
 myfiles <- file.path(path, files)
 myfiles = myfiles %>% str_subset(pattern = "results.*\\.gdx")
 myfiles
-myfiles=myfiles[c(2,5,6)]
+myfiles=myfiles[c(1)]
 myfiles
 
 ```
@@ -49,8 +49,9 @@ first_year = 2000
 max_year = 2150
 ```
 
-
+# jinv-t-n
 #I_EN
+(trad_cars, hybrid, plg_hybrid, edv; elwindon, elwindoff, elpv; ???)
 ```{r}
 variable = c("I_EN")
 res <- batch_extract(variable, files = myfiles) 
@@ -59,8 +60,8 @@ res
 
 res = res[which(res$jinv == "trad_cars" & res$n %in% c("usa","europe","china")),]
 ```
-
-#K_EN
+# jreal -t-n
+### K_EN
 ```{r}
 variable = c("K_EN")
 res <- batch_extract(variable, files = myfiles) 
@@ -70,8 +71,20 @@ res
 res = res[which(res$jreal == "battery" & res$n %in% c("usa","europe","china")),]
 res
 ```
+### MCOST_INV
+trad_cars, hybrid, plg_hybrid, edv; elwindon, elwindoff, elpv;
+```{r}
+variable = c("MCOST_INV")
+res <- batch_extract(variable, files = myfiles) 
+res = res[[variable]]
+res
 
-#UTILITY
+res = res[which(res$jreal == "battery" & res$n %in% c("usa","europe","china")),]
+res
+```
+
+# one value
+### UTILITY
 ```{r}
 variable = c("UTILITY")
 res <- batch_extract(variable, files = myfiles) 
@@ -86,20 +99,12 @@ paste0(round((1-res$value[base]/res$value[new])*100,2),"%")
 
 
 
+
+
+# PARAMETERS
+"Battery_cost", "Battery_cost_new", "Carbonprice", "Carshare", "Co2_transport", "Emi_bio_harv"
 ```{r}
-variable = c("MCOST_INV")
-res <- batch_extract(variable, files = myfiles) 
-res = res[[variable]]
-res
-
-res = res[which(res$jreal == "battery" & res$n %in% c("usa","europe","china")),]
-res
-```
-
-
-
-# battery cost
-```{r}
+parameters = c("Battery_cost", "Battery_cost_new", "Carbonprice", "Carshare", "Co2_transport", "Emi_bio_harv","tpes")
 variable = c("battery_cost_new")
 
 res <- batch_extract(variable, files = myfiles) 
@@ -125,7 +130,21 @@ data_perc = data_diff/res[res$gdx==gdxs[1],"value"]
 plot(data_diff,type="b",pch=16)
 plot(data_perc,type="b",pch=16)
 ```
-# Q_EMI
+# j-t-n
+### Q_EN
+trad_cars, hybrid, plg_hybrid, edv; elwindon, elwindoff, elpv; ???)
+```{r}
+variable = c("Q_EN")
+
+res <- batch_extract(variable, files = myfiles) 
+res = res[[variable]]
+res
+
+#res = res[which( res$n %in% c("china","usa")),]
+
+```
+# e-t-n
+### Q_EMI, BAU_Q_EMI, W_EMI
 
 ```{r}
 variable = c("Q_EMI")
@@ -134,6 +153,101 @@ res = res[[variable]]
 res
 res = res[which(res$e == "co2" & res$n %in% c("europe")),]
 ```
+# fuel -t -n 
+### Q_FUEL, COST_FUEL,MCOST_FUEL
+trbiofuel; advbiofuel; ?
+```{r}
+variable = c("MCOST_FUEL")
+res <- batch_extract(variable, files = myfiles) 
+res = res[[variable]]
+res
+res = res[which(res$e == "co2" & res$n %in% c("europe")),]
+```
+# fuel-t
+### FPRICE
+```{r}
+variable = c("FPRICE")
+res <- batch_extract(variable, files = myfiles) 
+res = res[[variable]]
+res
+res = res[which(res$e == "co2" & res$n %in% c("europe")),]
+```
+
+### MCOST_FUEL
+trbiofuel; advbiofuel; ?)
+```{r}
+variable = c("MCOST_FUEL")
+res <- batch_extract(variable, files = myfiles) 
+res = res[[variable]]
+res
+res = res[which(res$e == "co2" & res$n %in% c("europe")),]
+```
+# fuel-jfed-t-n
+### Q_IN
+(trad_cars, hybrid, plg_hybrid, edv; elwindon, elwindoff, elpv; ???)
+```{r}
+variable = c("Q_IN")
+res <- batch_extract(variable, files = myfiles) 
+res = res[[variable]]
+res
+res = res[which(res$e == "co2" & res$n %in% c("europe")),]
+```
+# t-n
+### I_EN_GRID, K_EN_GRID
+```{r}
+variable = c("I_EN_GRID")
+res <- batch_extract(variable, files = myfiles) 
+res = res[[variable]]
+res
+res = res[which(res$e == "co2" & res$n %in% c("europe")),]
+```
+#f-t-n
+### I_OUT: oil, Q_EMI_OUT, Q_OUT
+```{r}
+variable = c("I_OUT")
+res <- batch_extract(variable, files = myfiles) 
+res = res[[variable]]
+res
+res = res[which(res$e == "co2" & res$n %in% c("europe")),]
+```
+# rd-t-n
+### I_RD: battery, K_RD
+```{r}
+variable = c("I_RD")
+res <- batch_extract(variable, files = myfiles) 
+res = res[[variable]]
+res
+res = res[which(res$e == "co2" & res$n %in% c("europe")),]
+```
+# m-t-n
+### TEMP 
+```{r}
+variable = c("TEMP")
+res <- batch_extract(variable, files = myfiles) 
+res = res[[variable]]
+res
+res = res[which(res$e == "co2" & res$n %in% c("europe")),]
+```
+
+# e-m-t-n
+### WCUM_EMI
+```{r}
+variable = c("W_EMI")
+res <- batch_extract(variable, files = myfiles) 
+res = res[[variable]]
+res
+res = res[which(res$e == "co2" & res$n %in% c("europe")),]
+```
+# el_out-ices_el-t-n
+### QEL_OUT
+```{r}
+variable = c("QEL_OUT")
+res <- batch_extract(variable, files = myfiles) 
+res = res[[variable]]
+res
+res = res[which(res$e == "co2" & res$n %in% c("europe")),]
+```
+
 # MAIN PLOTTER
 
 ```{r}
@@ -219,49 +333,10 @@ ggplot() +
   theme(legend.position = "right")
 ```
 
+#VARIABLES
 ```{r}
-variables_all = c("Battery_cost","Battery_cost_new",
-"BAU_Q_EMI",
-"C_mkt","Carbonprice","Co2_transport",
-"COST_EMI","COST_FUEL","COST_OIL","CPRICE",
-"Ctax",
-"Cum_oil",
-"Disutility_cost_ldv",
-"Disutility_cost_stfr",
-"Elec_plg",
-"Eleg_stfr",
-"Emi_bio_harv",
-"FPRICE",
-"Fuel_cons",
-"Fuel_cons_stfr",
-"I_EN",
-"I_EN_GRID",
-"I_OIL",
-"I_OUT",
-"I_RD",
-"K",
-"K_EN",
-"K_EN_GRID",
-"K_RD",
-"MCOST_EMI",
-"MCOST_FUEL",
-"MCOST_INV",
-"OMEGA",
-"Q_EMI",
-"Q_EMI_OUT",
-"Q_EN",
-"Q_FUEL",
-"Q_IN",
-"Q_OUT",
-"QEL_OUT",
-"QNEL_OUT",
-"TEMP",
-"TPES",
-"UTILITY",
-"W_EMI",
-"Wcum",
-"WCUM_EMI"
-)
+
+
 ```
 
 
