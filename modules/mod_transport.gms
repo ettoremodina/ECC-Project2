@@ -263,8 +263,8 @@ edv             1
 /;
 
 *updated the battery_cost
-parameter battery_cost(t); 
-$loaddc battery_cost
+*parameter battery_cost(t); 
+*$loaddc battery_cost
 
 $gdxin
 
@@ -283,11 +283,11 @@ parameter increase_price_rare_material(t);
 $loaddc increase_price_rare_material
 $gdxin
 
-*$gdxin '%datapath%data_battery_updated.gdx'
-*updated the battery_cost
-*parameter battery_cost(t); 
-*$loaddc battery_cost
-*$gdxin
+$gdxin '%datapath%data_battery_updated.gdx'
+updated the battery_cost
+parameter battery_cost(t); 
+$loaddc battery_cost
+$gdxin
 
 ***
 *-------------------------------------------------------------------------------
@@ -424,7 +424,7 @@ eqmcost_inv_hybrid_%clt%
 eqmcost_inv_plghybrid_%clt%
 eqmcost_inv_edv_%clt%
 *** newcode
-*eqq_inv_red_ban_%clt%
+eqq_inv_red_ban_%clt%
 ***
 *-------------------------------------------------------------------------------
 $elseif %phase%=='eqs'
