@@ -427,8 +427,12 @@ eqq_inv_red_ban_%clt%
 $elseif %phase%=='eqs'
 
 *** newcode
-eqq_inv_red_ban_%clt%(t,n)$(mapn_th('%clt%'))..
-    I_EN('trad_cars',t,'usa')$(year(t) ge 2035) =l= 0.75*I_EN('trad_cars','6','usa');
+*eqq_inv_red_ban_%clt%(t,n)$(mapn_th('%clt%'))..
+*    I_EN('trad_cars',t,'usa')$(year(t) ge 2035) =l= 0.75*I_EN('trad_cars','6','usa');
+
+eqq_inv_red_ban_%clt%(t,n)$(mapn_th('%clt%') and year(t) ge 2035 and sameas(n,'usa'))..
+    I_EN('trad_cars',t,n) =l= 0.75*I_EN.l('trad_cars','6',n);
+
 
 ***
 *- Number of light duty vehicles
