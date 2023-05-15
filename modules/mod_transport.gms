@@ -262,7 +262,9 @@ plg_hybrid      1
 edv             1
 /;
 
-
+*updated the battery_cost
+parameter battery_cost(t); 
+$loaddc battery_cost
 
 $gdxin
 
@@ -281,18 +283,18 @@ parameter increase_price_rare_material(t);
 $loaddc increase_price_rare_material
 $gdxin
 
-$gdxin '%datapath%data_battery_updated.gdx'
+*$gdxin '%datapath%data_battery_updated.gdx'
 *updated the battery_cost
-parameter battery_cost(t); 
-$loaddc battery_cost
-$gdxin
+*parameter battery_cost(t); 
+*$loaddc battery_cost
+*$gdxin
 
 ***
 *-------------------------------------------------------------------------------
 $elseif %phase%=='compute_data'
 
 *** newcode
-battery_cost_new(t,n)=battery_cost(t) #BPU
+battery_cost_new(t,n)=battery_cost(t); #BPU
 *battery_cost_new(t,n) = (1+pi_lprice*increase_price_rare_material(t))*battery_cost(t);
 *battery_cost_new(t,n_w_rare_mat) = battery_cost(t);
 ***
@@ -372,7 +374,7 @@ ELMOTOR_COST.fx(t) $(year(t) ge 2050) = 23 ;
 
 
 *** newcode 
-*I_EN.up('trad_cars',t,'europe')$(year(t) ge 2035) = 1e-2;
+I_EN.up('trad_cars',t,'europe')$(year(t) ge 2035) = 1e-2;
 ****
 
 
@@ -428,7 +430,7 @@ eqmcost_inv_edv_%clt%
 $elseif %phase%=='eqs'
 
 *** newcode
-*eqq_inv_red_ban_%clt%(t,n)$(mapn_th('%clt%') and (year(t) ge 2035))..
+eqq_inv_red_ban_%clt%(t,n)$(mapn_th('%clt%') and (year(t) ge 2035))..
     I_EN('trad_cars',t,'usa') =l= 0.75*I_EN('trad_cars','6','usa');
 
 *eqq_inv_red_ban_%clt%(t,n)$(mapn_th('%clt%') and year(t) ge 2035 and sameas(n,'usa'))..
