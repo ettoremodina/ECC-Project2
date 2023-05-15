@@ -49,40 +49,6 @@ first_year = 2000
 max_year = 2150
 ```
 
-# jinv-t-n
-#I_EN
-(trad_cars, hybrid, plg_hybrid, edv; elwindon, elwindoff, elpv; ???)
-```{r}
-variable = c("I_EN")
-res <- batch_extract(variable, files = myfiles) 
-res = res[[variable]]
-res
-
-res = res[which(res$jinv == "trad_cars" & res$n %in% c("usa","europe","china")),]
-```
-# jreal -t-n
-### K_EN
-```{r}
-variable = c("K_EN")
-res <- batch_extract(variable, files = myfiles) 
-res = res[[variable]]
-res
-
-res = res[which(res$jreal == "battery" & res$n %in% c("usa","europe","china")),]
-res
-```
-### MCOST_INV
-trad_cars, hybrid, plg_hybrid, edv; elwindon, elwindoff, elpv;
-```{r}
-variable = c("MCOST_INV")
-res <- batch_extract(variable, files = myfiles) 
-res = res[[variable]]
-res
-
-res = res[which(res$jreal == "battery" & res$n %in% c("usa","europe","china")),]
-res
-```
-
 # one value
 ### UTILITY
 ```{r}
@@ -101,11 +67,11 @@ paste0(round((1-res$value[base]/res$value[new])*100,2),"%")
 
 
 
-# PARAMETERS
-"Battery_cost", "Battery_cost_new", "Carbonprice", "Carshare", "Co2_transport", "Emi_bio_harv"
+
+# t
+### battery_cost, emi_bio_harv
 ```{r}
-parameters = c("Battery_cost", "Battery_cost_new", "Carbonprice", "Carshare", "Co2_transport", "Emi_bio_harv","tpes")
-variable = c("battery_cost_new")
+variable = c("battery_cost")
 
 res <- batch_extract(variable, files = myfiles) 
 res = res[[variable]]
@@ -115,7 +81,8 @@ res
 
 ```
 
-# WCUM battery
+## V1-t-n
+### WCUM battery
 ```{r}
 variable = c("wcum")
 
@@ -130,39 +97,8 @@ data_perc = data_diff/res[res$gdx==gdxs[1],"value"]
 plot(data_diff,type="b",pch=16)
 plot(data_perc,type="b",pch=16)
 ```
-# j-t-n
-### Q_EN
-trad_cars, hybrid, plg_hybrid, edv; elwindon, elwindoff, elpv; ???)
-```{r}
-variable = c("Q_EN")
 
-res <- batch_extract(variable, files = myfiles) 
-res = res[[variable]]
-res
 
-#res = res[which( res$n %in% c("china","usa")),]
-
-```
-# e-t-n
-### Q_EMI, BAU_Q_EMI, W_EMI
-
-```{r}
-variable = c("Q_EMI")
-res <- batch_extract(variable, files = myfiles) 
-res = res[[variable]]
-res
-res = res[which(res$e == "co2" & res$n %in% c("europe")),]
-```
-# fuel -t -n 
-### Q_FUEL, COST_FUEL,MCOST_FUEL
-trbiofuel; advbiofuel; ?
-```{r}
-variable = c("MCOST_FUEL")
-res <- batch_extract(variable, files = myfiles) 
-res = res[[variable]]
-res
-res = res[which(res$e == "co2" & res$n %in% c("europe")),]
-```
 # fuel-t
 ### FPRICE
 ```{r}
@@ -170,86 +106,118 @@ variable = c("FPRICE")
 res <- batch_extract(variable, files = myfiles) 
 res = res[[variable]]
 res
-res = res[which(res$e == "co2" & res$n %in% c("europe")),]
+ 
 ```
 
-### MCOST_FUEL
-trbiofuel; advbiofuel; ?)
-```{r}
-variable = c("MCOST_FUEL")
-res <- batch_extract(variable, files = myfiles) 
-res = res[[variable]]
-res
-res = res[which(res$e == "co2" & res$n %in% c("europe")),]
-```
-# fuel-jfed-t-n
-### Q_IN
-(trad_cars, hybrid, plg_hybrid, edv; elwindon, elwindoff, elpv; ???)
-```{r}
-variable = c("Q_IN")
-res <- batch_extract(variable, files = myfiles) 
-res = res[[variable]]
-res
-res = res[which(res$e == "co2" & res$n %in% c("europe")),]
-```
-# t-n
-### I_EN_GRID, K_EN_GRID
+
+# t-ntpes
+### I_EN_GRID, K_EN_GRID, battery_cost_new, co2_transport,
 ```{r}
 variable = c("I_EN_GRID")
 res <- batch_extract(variable, files = myfiles) 
 res = res[[variable]]
 res
-res = res[which(res$e == "co2" & res$n %in% c("europe")),]
+ 
 ```
-#f-t-n
-### I_OUT: oil, Q_EMI_OUT, Q_OUT
+# X-t-n
+
 ```{r}
-variable = c("I_OUT")
+vars = c("I_EN", "Q_EN", "MCOST_INV", "K_EN","Q_EMI", "BAU_Q_EMI", 
+         "W_EMI","Q_FUEL", "COST_FUEL","MCOST_FUEL","I_OUT", "Q_EMI_OUT",
+         "Q_OUT", "Q_EMI_OUT","Q_OUT","I_RD","TEMP")
+
+vars
+
+variable = vars[1]
 res <- batch_extract(variable, files = myfiles) 
-res = res[[variable]]
+res = res[[variable]] # move from list to dataframe
+
+# group by region
+res <- res %>%
+group_by(scen,year) %>%
+summarise(value = sum(value))
 res
-res = res[which(res$e == "co2" & res$n %in% c("europe")),]
+ 
 ```
-# rd-t-n
+
+
+
+## jinv-t-n
+### I_EN
+(trad_cars, hybrid, plg_hybrid, edv; elwindon, elwindoff, elpv; ???)
+```{r}
+res = res[which(res$jinv == "trad_cars" & res$n %in% c("usa","europe","china")),]
+```
+
+## j-t-n
+### Q_EN
+trad_cars, hybrid, plg_hybrid, edv; elwindon, elwindoff, elpv; ???)
+```{r}
+res = res[which( res$n %in% c("china","usa")),]
+```
+## jreal -t-n
+### MCOST_INV, K_EN
+trad_cars, hybrid, plg_hybrid, edv; elwindon, elwindoff, elpv;
+```{r}
+res = res[which(res$jreal == "battery" & res$n %in% c("usa","europe","china")),]
+```
+
+## e-t-n
+### Q_EMI, BAU_Q_EMI, W_EMI
+
+```{r}
+res
+```
+
+## fuel -t -n 
+### Q_FUEL, COST_FUEL,MCOST_FUEL
+trbiofuel; advbiofuel; ?
+```{r}
+res
+```
+
+## f-t-n
+### I_OUT: oil, Q_EMI_OUT, Q_OUT, Q_EMI_OUT,Q_OUT
+```{r}
+res
+```
+## rd-t-n
 ### I_RD: battery, K_RD
 ```{r}
-variable = c("I_RD")
-res <- batch_extract(variable, files = myfiles) 
-res = res[[variable]]
 res
-res = res[which(res$e == "co2" & res$n %in% c("europe")),]
 ```
-# m-t-n
+## m-t-n
 ### TEMP 
 ```{r}
-variable = c("TEMP")
-res <- batch_extract(variable, files = myfiles) 
-res = res[[variable]]
 res
-res = res[which(res$e == "co2" & res$n %in% c("europe")),]
 ```
 
-# e-m-t-n
-### WCUM_EMI
+# X-Y-t-n
+
 ```{r}
-variable = c("W_EMI")
-res <- batch_extract(variable, files = myfiles) 
-res = res[[variable]]
-res
-res = res[which(res$e == "co2" & res$n %in% c("europe")),]
+vars2 = c("Q_IN","WCUM_EMI","W_E","QEL_OUT")
 ```
-# el_out-ices_el-t-n
+
+## fuel-jfed-t-n
+### Q_IN
+(trad_cars, hybrid, plg_hybrid, edv; elwindon, elwindoff, elpv; ???)
+```{r}
+res
+```
+## e-m-t-n
+### WCUM_EMI,W_EMI
+```{r}
+res
+```
+## el_out-ices_el-t-n
 ### QEL_OUT
 ```{r}
-variable = c("QEL_OUT")
-res <- batch_extract(variable, files = myfiles) 
-res = res[[variable]]
 res
-res = res[which(res$e == "co2" & res$n %in% c("europe")),]
 ```
 
-# MAIN PLOTTER
 
+# ###########################################################
+# MAIN PLOTTER
 ```{r}
 v = variable # rename for semplicity
 data = res %>% as_tibble()
@@ -298,7 +266,6 @@ scale_color_viridis(name = "Scenario",discrete = TRUE, option = "D")
 ```
 
 # area between curves
-
 ```{r}
 v = variable # rename for semplicity
 
@@ -332,17 +299,6 @@ ggplot() +
   scale_color_manual(values = c("red", "green"), labels = c("ssp2_bau", "ssp2_ctax")) +
   theme(legend.position = "right")
 ```
-
-#VARIABLES
-```{r}
-
-
-```
-
-
-
-
-
 
 # world visual-battery_cost
 ```{r}
