@@ -71,6 +71,8 @@ ctax(ghg,t,n) = 0;
 * Default emission cap
 e_cap(ghg) = yes;
 emi_cap(t,n) = 500;
+*** newcode
+emi_cap(t,n)$(year(t) gt 2050 and sameas(n,'europe')) = 0.1;
 
 $ifthen.pol %policy%=="bau"
 
@@ -93,9 +95,9 @@ $else.cg
 ((1+(%scen%)/100)**(year(t)-%ctax_year%))
 $endif.cg
 ;
-
+*** newcode
 emi_cap(t,n) = 100; # very high number
-emi_cap(t,n)$(year(t) gt 2050 and sameas(n,'europe')) = 0; # very high number
+*emi_cap(t,n)$(year(t) gt 2050 and sameas(n,'europe')) = 0;
 
 $endif.pol
 

@@ -80,16 +80,15 @@ mygdx  =gdx("data_battery.gdx")
 ```
 
 ```{r}
-no_lit <- c("canada","jpnkor","mexico","india","indonesia","mena","sasia","seasia","te")
-lit = setdiff(no_lit, all)
+no_lit <- c("canada","jpnkor","mexico","india","indonesia","mena","sasia","seasia","te","europe", "usa", "brazil", "ssa")
+lit = setdiff(no_lit, n)
 no_lit_maybe <- c("europe", "usa", "brazil", "ssa")
-no_cob <- c("europe", "jpnkor", "mexico", "usa", "brazil", "india", "indonesia", "sasia")
+no_cob <- c("europe", "jpnkor", "mexico", "usa", "brazil", "india", "indonesia", "sasia","laca")
 no_cob_maybe = "laca"
-cob = setdiff(no_cob, all)
+cob = setdiff(no_cob, n)
 lit_cob <- c("oceania", "china", "southafrica")
 
-all <- unique(c(no_lit, lit, no_lit_maybe, no_cob, lit_cob, no_cob_maybe))
-sort(all)
+
 
 #is_included <- setdiff(as.vector(countrys$V1), all)
 
@@ -97,9 +96,7 @@ countrys <- unique(c(no_lit, no_lit_maybe, no_cob, no_cob_maybe, lit_cob))
 df <- data.frame(
   n = countrys,
   no_lit = as.numeric(countrys %in% no_lit),
-  no_lit_maybe = as.numeric(countrys %in% no_lit_maybe),
   no_cob = as.numeric(countrys %in% no_cob),
-  no_cob_maybe = as.numeric(countrys %in% no_cob_maybe),
   lit_cob = as.numeric(countrys %in% lit_cob)
 )
 

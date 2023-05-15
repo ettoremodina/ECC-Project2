@@ -49,31 +49,6 @@ first_year = 2000
 max_year = 2150
 ```
 
-# battery cost
-```{r}
-res <- batch_extract(variables, files = myfiles) # load GHG emissions
-plot(res$battery_cost[,c(1:2)],pch = 16)
-res$battery_cost[,c(1:2)]
-res$battery_cost[which(res$battery_cost[,2]==min(res$battery_cost[,2])),1]
-
-t0 = 1
-t1 = 30
-y_t0=res$battery_cost[which(res$battery_cost[,1]==t0),2]
-y_t1=res$battery_cost[which(res$battery_cost[,1]==t1),2]
-
-x=seq(from=1,to=30,length.out=30)
-y = res$battery_cost[,2]
-model <- lm(y~exp(1/x))
-summary(model)
-
-#use the model to predict the y-values based on the x-values
-yy=predict(model,newdata = list(x=seq(30), interval="confidence"))
-
-#add the fitted regression line to the plot (lwd specifies the width of the line)
-matlines(x,y_t1+100*exp(1/x))
-#points(x,y_t1-b/log(x),col = "gold",pch = 16)
-
-```
 
 #I_EN
 ```{r}
@@ -198,19 +173,27 @@ scale_x_continuous(limits=c(first_year+tstep, max_year),
 #scale_color_discrete(name = "Scenario")
 scale_color_viridis(name = "Scenario",discrete = TRUE, option = "D")
 ```
-<<<<<<< Updated upstream
+
+# area between curves
+
 ```{r}
+v = variable # rename for semplicity
+
+data = res %>% as_tibble()
+data <- data %>%
 mutate(scen = basename(gdx)) %>% 
 mutate(scen = str_replace(scen, ".gdx", "")) %>%
 mutate(scen = str_replace(scen, "results_", ""))
 levs = unique(data$scen)
 data <- data %>% mutate(scen = factor(scen, levels = levs))
+
 ## group regiondata into worlddata
 #data <- data %>% group_by(scen,year) %>% summarise(value = sum(value))
 y_up <- data[data$scen=='ssp2_bau',]$value  
 y_low <- data[data$scen=='ssp2_ctax',]$value
-x <- data$year[1:30]
+x <- seq(2005,2150,by=5)
 df_combined <- data.frame(x, y_up, y_low)
+
 # Create the plot
 ggplot() +
   geom_ribbon(data = df_combined, aes(x = x, ymin = y_low, ymax = y_up), 
@@ -226,7 +209,7 @@ ggplot() +
   scale_color_manual(values = c("red", "green"), labels = c("ssp2_bau", "ssp2_ctax")) +
   theme(legend.position = "right")
 ```
-# area between curves
+
 ```{r}
 variable = c("Q_EMI")
 res <- batch_extract(variable, files = myfiles) 
@@ -234,44 +217,10 @@ res = res[[variable]]
 res
 res = res[which(res$e == "co2" & res$n %in% c("europe")),]
 ```
-```{r}
-v = variable # rename for semplicity
-data = res %>% as_tibble()
-data <- data %>%
-# Transform time period into year, t0 and tsep could be different
-mutate(year = as.numeric(t) * tstep + first_year) %>% 
-# Transform the filename into a scenario name
-mutate(scen = basename(gdx)) %>% 
-mutate(scen = str_replace(scen, ".gdx", "")) %>%
-mutate(scen = str_replace(scen, "results_", ""))
-levs = unique(data$scen)
-data <- data %>% mutate(scen = factor(scen, levels = levs))
-## group regiondata into worlddata
-#data <- data %>% group_by(scen,year) %>% summarise(value = sum(value))
-y_up <- data[data$scen=='ssp2_bau',]$value  
-y_low <- data[data$scen=='ssp2_ctax',]$value
-x <- data$year[1:30]
-df_combined <- data.frame(x, y_up, y_low)
-# Create the plot
-ggplot() +
-  geom_ribbon(data = df_combined, aes(x = x, ymin = y_low, ymax = y_up), 
-              fill = "blue", alpha = 0.3) +
-  geom_line(data = df_combined, aes(x = x, y = y_up), color = "red") +
-  geom_line(data = df_combined, aes(x = x, y = y_low), color = "green") +
-  geom_point() + # NEW GEOMETRY, SAME DATA AND MAPPING
-  labs(x = "", y = v, title = v) +
-  #theme_bw() +
-  #theme(axis.text.x = element_text(angle = 45, hjust = 1))+
-  scale_x_continuous(limits=c(first_year+tstep, max_year),
-                    breaks=seq(first_year+tstep, max_year,by = 10)) +
-  scale_color_manual(values = c("red", "green"), labels = c("ssp2_bau", "ssp2_ctax")) +
-  theme(legend.position = "right")
-```
 
-=======
->>>>>>> Stashed changes
 
-# world visual
+
+# world visual-battery_cost
 ```{r}
 # import the WITCH model regional definition
 wreg <- read_csv('mapwitch17.csv')
@@ -291,19 +240,22 @@ world <- merge(world,wreg, by.x = "adm0_a3", by.y = "ISO")
 
 # merge with the emission data.frame
 world0 <- merge(world,res %>% filter(t == 30), by = "n", allow.cartesian=TRUE)
+world1 <- st_transform(world0, crs = target_crs)
 # Use a better projection 'equal projection'
 target_crs <- '+proj=eqearth +wktext'
-world1 <- st_transform(world0, crs = target_crs)
+my_palette <- c("red", "green")
 
+# Create a new variable indicating whether value is higher than 700
+world1$color_category <- ifelse(world1$value > 700, "In posess of rare material", "No rare materials")
+
+# Plot the map with discrete colors
 ggplot(data = world1) +
-  
-geom_sf(aes(fill = value)) +
-  
-coord_sf(datum = target_crs, expand = FALSE, clip = "off") +
-  
-scale_fill_distiller(name = "CO2 emission\nreduction\n[GtCO2]",
-                     palette ="RdYlGn", direction = -1) +
-theme_void()
+  geom_sf(aes(fill = color_category)) +
+  coord_sf(datum = target_crs, expand = FALSE, clip = "off") +
+  scale_fill_manual(name = "Battery Cost",
+                    values = setNames(my_palette, c("In posess of rare material", "No rare materials")),
+                    guide = guide_legend(title = "Battery Cost")) +
+  theme_void()
 ```
 
 

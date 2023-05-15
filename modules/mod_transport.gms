@@ -8,7 +8,7 @@ $ifthen %phase%=='conf'
 $setglobal tra_baseline %baseline%
 
 *** newcode
-$setglobal perc_incr 2
+$setglobal perc_incr 4
 
 *-------------------------------------------------------------------------------
 $elseif %phase%=='sets'
@@ -268,21 +268,12 @@ $gdxin
 
 scalar smooth_ldv / 1.25 /;
 
-*** new code
-parameter next_gen_battery_cost(t);
-parameter carshare(t,n);
-
+*** newcode
 parameter 
     battery_cost_new(t,n);
 
 parameter perc_incr_price_lith  #setglobal
     pi_lprice /%perc_incr%/;  
-
-*parameter increase_price_rare_material(t);
-
-parameter
-    dec_inv(t,n);
-
 
 $gdxin '%datapath%data_battery.gdx'
 *increasing function [0,30]->[0,1)
@@ -300,9 +291,7 @@ $gdxin
 *-------------------------------------------------------------------------------
 $elseif %phase%=='compute_data'
 
-*** new code
-dec_inv(t,n) = 1;
-
+*** newcode
 battery_cost_new(t,n) = (1+pi_lprice*increase_price_rare_material(t))*battery_cost(t);
 battery_cost_new(t,n_w_rare_mat) = battery_cost(t);
 ***
@@ -327,14 +316,6 @@ loop((tm1,t,n)$(pre(tm1,t) and year(t) gt 2015),
         ldv_pthc(t,n)$(ldv_pthc(tm1,n) gt 600) = ldv_pthc(tm1,n)*(1+(gdppc(t,n)/gdppc(tm1,n)-1)*oge('c5'))+ai('c5');
     );
 );
-
-*** newcode CARSHARING
-* da trasformare in variabile per poter inserire unvestimenti
-carshare(t,n) = 1;
-ldv_pthc(t,n) = ldv_pthc(t,n) * coeff_ldv(t,n) * carshare(t,n);
-
-ldv_total(t,n) = ldv_pthc(t,n)*l(t,n)/1e3;
-***
 
 * 2) Calculation of demand and consumption
 
@@ -377,8 +358,6 @@ ELMOTOR_COST.fx(t) $(year(t) ge 2050) = 23 ;
 **Policy:
 *100% ZEV sales after 2035 (ZEV=Zero Emission Vehicles = Electric + Hybrid).Sales=limito gli investimenti I
 
-*K_EN.l('trad_cars',t,'europe')$(year(t) eq 2040) = 0.95*K_EN.l('trad_cars',t,'europe')$(year(t) eq 2035);
-*EU è già a posto così 
 
 *ICE ban (ban on internal combustion engine cars, aka traditional cars). Ban=limito la quantità K
 
@@ -420,8 +399,6 @@ K_RD.lo('battery',t,n)$((not tfix(t)) and (year(t) ge 2010)) = krd0('battery',n)
 K_EN.fx('battery',t,n) = 0;
 Q_EN.fx('battery',t,n) = 0;
 
-**newcode
-*MCOST_INV.up('next_gen_battery',t,n)$(not tfix(t)) = next_gen_battery_cost(tfirst);
 
 MCOST_INV.up('battery',t,n)$(not tfix(t)) = battery_cost_new(tfirst,n);
 MCOST_INV.fx('battery',t,n)$((not tfix(t)) and (year(t) lt rd_time('battery','start'))) = battery_cost_new(t,n);
