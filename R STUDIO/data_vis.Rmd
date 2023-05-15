@@ -92,7 +92,7 @@ res
 
 ### I_EN_GRID, K_EN_GRID, battery_cost_new, co2_transport, tpes: : t-n
 ```{r}
-variable = c("I_EN_GRID")
+variable = c("K_EN_GRID")
 res <- batch_extract(variable, files = myfiles) 
 res = res[[variable]]
 res
@@ -114,7 +114,7 @@ vars = c("I_EN", "Q_EN", "MCOST_INV", "K_EN","Q_EMI", "BAU_Q_EMI",
 
 vars
 
-variable = vars[1]
+variable = vars[18]
 res <- batch_extract(variable, files = myfiles) 
 res = res[[variable]] # move from list to dataframe
 res
@@ -127,12 +127,11 @@ res <- res %>%
 group_by(gdx,t,V1) %>%
 summarise(value = sum(value))
 res
+unique(res$V1)
 ```
 # chose subgroup grouped by region
 ```{r}
-unique(res$V1)
-
-var_chosen1 = "trad_cars"
+var_chosen1 = "battery"
 res = res[which(res$V1 == var_chosen1 ),]
 ```
 
@@ -236,8 +235,6 @@ data <- data %>%
 # Transform time period into year, t0 and tsep could be different
 mutate(year = as.numeric(t) * tstep + first_year) %>% 
 # Transform the filename into a scenario name
-## would be cool to subdivide each sub scenario indipendently but don't know if it's even worth it
-## NB: save different analysis in different folders
 mutate(scen = basename(gdx)) %>% 
 mutate(scen = str_replace(scen, ".gdx", "")) %>%
 mutate(scen = str_replace(scen, "results_", ""))
