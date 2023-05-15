@@ -37,7 +37,7 @@ files <- list.files(path,pattern = ".gdx")
 myfiles <- file.path(path, files)
 myfiles = myfiles %>% str_subset(pattern = "results.*\\.gdx")
 myfiles
-myfiles=myfiles[c(1)]
+myfiles=myfiles[c(1,2,3)]
 myfiles
 
 ```
@@ -144,48 +144,50 @@ res
 ```
 # chose subgroup grouped by region
 ```{r}
-res = res[which(res$V1 == "trad_cars" ),]
+unique(res$V1)
+
+var_chosen1 = "trad_cars"
+res = res[which(res$V1 == var_chosen1 ),]
 ```
 
 # chose subgroup not grouped by region
 ```{r}
 chosen_countrys = c("usa","europe","china")
-res = res[which(res$V1 == "trad_cars" & res$n %in% chosen_countrys),]
+res = res[which(res$V1 == var_chosen1 & res$n %in% chosen_countrys),]
 ```
 
 
 
-## jinv-t-n
-### I_EN
+jinv-t-n
+I_EN
 (trad_cars, hybrid, plg_hybrid, edv; elwindon, elwindoff, elpv; ???)
 
 
-## j-t-n
-### Q_EN
+j-t-n
+Q_EN
 trad_cars, hybrid, plg_hybrid, edv; elwindon, elwindoff, elpv; ???)
 
-## jreal -t-n
-### MCOST_INV, K_EN
+jreal -t-n
+MCOST_INV, K_EN
 trad_cars, hybrid, plg_hybrid, edv; elwindon, elwindoff, elpv;
 
 
-## e-t-n
-### Q_EMI, BAU_Q_EMI, W_EMI
+e-t-n
+Q_EMI, BAU_Q_EMI, W_EMI
 
-
-## fuel -t -n 
-### Q_FUEL, COST_FUEL,MCOST_FUEL
+fuel -t -n 
+Q_FUEL, COST_FUEL,MCOST_FUEL
 trbiofuel; advbiofuel; ?
 
 
-## f-t-n
-### I_OUT: oil, Q_EMI_OUT, Q_OUT, Q_EMI_OUT,Q_OUT
+f-t-n
+I_OUT: oil, Q_EMI_OUT, Q_OUT, Q_EMI_OUT,Q_OUT
 
-## rd-t-n
-### I_RD: battery, K_RD
+rd-t-n
+I_RD: battery, K_RD
 
-## m-t-n
-### TEMP 
+m-t-n
+TEMP 
 
 
 # X-Y-t-n
@@ -212,26 +214,30 @@ res
 ```
 # chose subgroup grouped by region
 ```{r}
-res = res[which(res$V1 == "trad_cars" ),]
-res = res[which(res$V2 == "trad_cars" ),]
+unique(res$V1)
+unique(res$V2)
+
+var_chosen1 = "trad_cars"
+var_chosen2 = "trad_cars"
+res = res[which(res$V1 == var_chosen1 &res$V2 == var_chosen2),]
 ```
 
 # chose subgroup not grouped by region
 ```{r}
 chosen_countrys = c("usa","europe","china")
-res = res[which(res$V1 == "trad_cars" & res$V2 == "trad_cars" & res$n %in% chosen_countrys),]
+res = res[which(res$V1 == var_chosen1 & res$V2 == var_chosen2 & res$n %in% chosen_countrys),]
 
 ```
 
-## fuel-jfed-t-n
-### Q_IN
+fuel-jfed-t-n
+Q_IN
 (trad_cars, hybrid, plg_hybrid, edv; elwindon, elwindoff, elpv; ???)
 
-## e-m-t-n
-### WCUM_EMI,W_EMI
+e-m-t-n
+WCUM_EMI,W_EMI
 
-## el_out-ices_el-t-n
-### QEL_OUT
+el_out-ices_el-t-n
+QEL_OUT
 
 
 
@@ -253,11 +259,6 @@ mutate(scen = str_replace(scen, "results_", ""))
 
 levs = unique(data$scen)
 data <- data %>% mutate(scen = factor(scen, levels = levs))
-
-
-## group regiondata into worlddata
-#data <- data %>% group_by(scen,year) %>% summarise(value = sum(value))
-
 
 ggplot(data %>% filter(year <= max_year),
       aes(x = year, y = value, color = scen)) +
