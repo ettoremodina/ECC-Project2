@@ -131,13 +131,26 @@ vars
 variable = vars[1]
 res <- batch_extract(variable, files = myfiles) 
 res = res[[variable]] # move from list to dataframe
+res
+colnames(res)[1] = "V1"
+```
 
 # group by region
+```{r}
 res <- res %>%
-group_by(scen,year) %>%
+group_by(gdx,t,V1) %>%
 summarise(value = sum(value))
 res
- 
+```
+# chose subgroup grouped by region
+```{r}
+res = res[which(res$V1 == "trad_cars" ),]
+```
+
+# chose subgroup not grouped by region
+```{r}
+chosen_countrys = c("usa","europe","china")
+res = res[which(res$V1 == "trad_cars" & res$n %in% chosen_countrys),]
 ```
 
 
@@ -145,75 +158,81 @@ res
 ## jinv-t-n
 ### I_EN
 (trad_cars, hybrid, plg_hybrid, edv; elwindon, elwindoff, elpv; ???)
-```{r}
-res = res[which(res$jinv == "trad_cars" & res$n %in% c("usa","europe","china")),]
-```
+
 
 ## j-t-n
 ### Q_EN
 trad_cars, hybrid, plg_hybrid, edv; elwindon, elwindoff, elpv; ???)
-```{r}
-res = res[which( res$n %in% c("china","usa")),]
-```
+
 ## jreal -t-n
 ### MCOST_INV, K_EN
 trad_cars, hybrid, plg_hybrid, edv; elwindon, elwindoff, elpv;
-```{r}
-res = res[which(res$jreal == "battery" & res$n %in% c("usa","europe","china")),]
-```
+
 
 ## e-t-n
 ### Q_EMI, BAU_Q_EMI, W_EMI
 
-```{r}
-res
-```
 
 ## fuel -t -n 
 ### Q_FUEL, COST_FUEL,MCOST_FUEL
 trbiofuel; advbiofuel; ?
-```{r}
-res
-```
+
 
 ## f-t-n
 ### I_OUT: oil, Q_EMI_OUT, Q_OUT, Q_EMI_OUT,Q_OUT
-```{r}
-res
-```
+
 ## rd-t-n
 ### I_RD: battery, K_RD
-```{r}
-res
-```
+
 ## m-t-n
 ### TEMP 
-```{r}
-res
-```
+
 
 # X-Y-t-n
 
 ```{r}
 vars2 = c("Q_IN","WCUM_EMI","W_E","QEL_OUT")
+
+vars2
+
+variable = vars2[1]
+res <- batch_extract(variable, files = myfiles) 
+res = res[[variable]] # move from list to dataframe
+res
+colnames(res)[1] = "V1"
+colnames(res)[2] = "V2"
+```
+
+# group by region
+```{r}
+res <- res %>%
+group_by(gdx,t,V1,V2) %>%
+summarise(value = sum(value))
+res
+```
+# chose subgroup grouped by region
+```{r}
+res = res[which(res$V1 == "trad_cars" ),]
+res = res[which(res$V2 == "trad_cars" ),]
+```
+
+# chose subgroup not grouped by region
+```{r}
+chosen_countrys = c("usa","europe","china")
+res = res[which(res$V1 == "trad_cars" & res$V2 == "trad_cars" & res$n %in% chosen_countrys),]
+
 ```
 
 ## fuel-jfed-t-n
 ### Q_IN
 (trad_cars, hybrid, plg_hybrid, edv; elwindon, elwindoff, elpv; ???)
-```{r}
-res
-```
+
 ## e-m-t-n
 ### WCUM_EMI,W_EMI
-```{r}
-res
-```
+
 ## el_out-ices_el-t-n
 ### QEL_OUT
-```{r}
-res
-```
+
 
 
 # ###########################################################
