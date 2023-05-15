@@ -37,20 +37,16 @@ files <- list.files(path,pattern = ".gdx")
 myfiles <- file.path(path, files)
 myfiles = myfiles %>% str_subset(pattern = "results.*\\.gdx")
 myfiles
-myfiles=myfiles[c(1,2,3)]
+myfiles=myfiles[c(1,2,6,7)]
 myfiles
 
-```
-
 # TIME
-```{r}
 tstep = 5
 first_year = 2000
 max_year = 2150
 ```
 
-# one value
-### UTILITY
+### UTILITY: unique value
 ```{r}
 variable = c("UTILITY")
 res <- batch_extract(variable, files = myfiles) 
@@ -63,13 +59,7 @@ paste0(round((1-res$value[base]/res$value[new])*100,2),"%")
 
 ```
 
-
-
-
-
-
-# t
-### battery_cost, emi_bio_harv
+### battery_cost, emi_bio_harv: only t
 ```{r}
 variable = c("battery_cost")
 
@@ -81,16 +71,9 @@ res
 
 ```
 
-## V1-t-n
-### WCUM battery
+# data-diff
 ```{r}
-variable = c("wcum")
 
-res <- batch_extract(variable, files = myfiles) 
-res = res[[variable]]
-res
-
-res = res[res$V1=="battery",]
 gdxs = unique(res$gdx)
 data_diff = res[res$gdx==gdxs[2],"value"]-res[res$gdx==gdxs[1],"value"]
 data_perc = data_diff/res[res$gdx==gdxs[1],"value"]
@@ -98,9 +81,7 @@ plot(data_diff,type="b",pch=16)
 plot(data_perc,type="b",pch=16)
 ```
 
-
-# fuel-t
-### FPRICE
+### FPRICE: fuel-t
 ```{r}
 variable = c("FPRICE")
 res <- batch_extract(variable, files = myfiles) 
@@ -109,9 +90,7 @@ res
  
 ```
 
-
-# t-ntpes
-### I_EN_GRID, K_EN_GRID, battery_cost_new, co2_transport,
+### I_EN_GRID, K_EN_GRID, battery_cost_new, co2_transport, tpes: : t-n
 ```{r}
 variable = c("I_EN_GRID")
 res <- batch_extract(variable, files = myfiles) 
@@ -119,12 +98,19 @@ res = res[[variable]]
 res
  
 ```
+# group by region
+```{r}
+res <- res %>%
+group_by(gdx,t) %>%
+summarise(value = sum(value))
+res
+```
 # X-t-n
 
 ```{r}
 vars = c("I_EN", "Q_EN", "MCOST_INV", "K_EN","Q_EMI", "BAU_Q_EMI", 
          "W_EMI","Q_FUEL", "COST_FUEL","MCOST_FUEL","I_OUT", "Q_EMI_OUT",
-         "Q_OUT", "Q_EMI_OUT","Q_OUT","I_RD","TEMP")
+         "Q_OUT", "Q_EMI_OUT","Q_OUT","I_RD","TEMP","wcum")
 
 vars
 
@@ -191,7 +177,6 @@ TEMP
 
 
 # X-Y-t-n
-
 ```{r}
 vars2 = c("Q_IN","WCUM_EMI","W_E","QEL_OUT")
 
