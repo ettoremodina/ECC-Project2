@@ -316,7 +316,9 @@ loop((tm1,t,n)$(pre(tm1,t) and year(t) gt 2015),
         ldv_pthc(t,n)$(ldv_pthc(tm1,n) gt 600) = ldv_pthc(tm1,n)*(1+(gdppc(t,n)/gdppc(tm1,n)-1)*oge('c5'))+ai('c5');
     );
 );
+ldv_pthc(t,n) = ldv_pthc(t,n) * coeff_ldv(t,n);
 
+ldv_total(t,n) = ldv_pthc(t,n)*l(t,n)/1e3;
 * 2) Calculation of demand and consumption
 
 km_demand_ldv(t,n) = (travel_intensity(t,n)*(ykali(t,n)*1e12))/1e6;

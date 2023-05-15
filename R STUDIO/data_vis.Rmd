@@ -125,10 +125,19 @@ data_perc = data_diff/res[res$gdx==gdxs[1],"value"]
 plot(data_diff,type="b",pch=16)
 plot(data_perc,type="b",pch=16)
 ```
+# Q_EMI
+
+```{r}
+variable = c("Q_EMI")
+res <- batch_extract(variable, files = myfiles) 
+res = res[[variable]]
+res
+res = res[which(res$e == "co2" & res$n %in% c("europe")),]
+```
+# MAIN PLOTTER
 
 ```{r}
 v = variable # rename for semplicity
-
 data = res %>% as_tibble()
 
 data <- data %>%
@@ -211,12 +220,52 @@ ggplot() +
 ```
 
 ```{r}
-variable = c("Q_EMI")
-res <- batch_extract(variable, files = myfiles) 
-res = res[[variable]]
-res
-res = res[which(res$e == "co2" & res$n %in% c("europe")),]
+variables_all = c("Battery_cost","Battery_cost_new",
+"BAU_Q_EMI",
+"C_mkt","Carbonprice","Co2_transport",
+"COST_EMI","COST_FUEL","COST_OIL","CPRICE",
+"Ctax",
+"Cum_oil",
+"Disutility_cost_ldv",
+"Disutility_cost_stfr",
+"Elec_plg",
+"Eleg_stfr",
+"Emi_bio_harv",
+"FPRICE",
+"Fuel_cons",
+"Fuel_cons_stfr",
+"I_EN",
+"I_EN_GRID",
+"I_OIL",
+"I_OUT",
+"I_RD",
+"K",
+"K_EN",
+"K_EN_GRID",
+"K_RD",
+"MCOST_EMI",
+"MCOST_FUEL",
+"MCOST_INV",
+"OMEGA",
+"Q_EMI",
+"Q_EMI_OUT",
+"Q_EN",
+"Q_FUEL",
+"Q_IN",
+"Q_OUT",
+"QEL_OUT",
+"QNEL_OUT",
+"TEMP",
+"TPES",
+"UTILITY",
+"W_EMI",
+"Wcum",
+"WCUM_EMI"
+)
 ```
+
+
+
 
 
 
@@ -241,12 +290,19 @@ world <- merge(world,wreg, by.x = "adm0_a3", by.y = "ISO")
 # merge with the emission data.frame
 world0 <- merge(world,res %>% filter(t == 30), by = "n", allow.cartesian=TRUE)
 world1 <- st_transform(world0, crs = target_crs)
+
 # Use a better projection 'equal projection'
 target_crs <- '+proj=eqearth +wktext'
 my_palette <- c("red", "green")
 
 # Create a new variable indicating whether value is higher than 700
 world1$color_category <- ifelse(world1$value > 700, "In posess of rare material", "No rare materials")
+
+
+```
+
+
+```{r}
 
 # Plot the map with discrete colors
 ggplot(data = world1) +
