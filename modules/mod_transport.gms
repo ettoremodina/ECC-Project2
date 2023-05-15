@@ -283,7 +283,7 @@ parameter increase_price_rare_material(t);
 $loaddc increase_price_rare_material
 
 $gdxin '%datapath%data_battery_updated.gdx'
-updated the battery_cost
+#updated the battery_cost
 parameter battery_cost(t); 
 $loaddc battery_cost
 $gdxin
