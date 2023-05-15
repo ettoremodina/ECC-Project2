@@ -57,8 +57,8 @@ t = seq(1,30)
 b0 = 803.48
 bf = 90
 
-battery_cost = round((b0-bf)*exp(-5/3*(t-1))+bf,2)
-battery_cost = data.frame(t=t,value=battery_cost)
+battery_cost_vals = round((b0-bf)*exp(-5/3*(t-1))+bf,2)
+battery_cost = data.frame(t=t,value=battery_cost_vals)
 
 ggplot(battery_cost,aes(x=t,y=battery_cost_),type="b",pch = 16)+ geom_line() 
 
@@ -67,17 +67,36 @@ write.gdx("data_battery_updated.gdx", list(battery_cost = battery_cost), compres
 
 ```{r}
 t = seq(1,30)
-p_rmb = 0.1
-pi_lprice = 0.5
+p_rmb = 0.15
 
-growth_rate = (1-exp(-5/(30)*t))
-#growth_rate=1
-inc_prmat =  1+p_rmb*pi_lprice*growth_rate
-df = data.frame(t,value=round(growth_rate,2))
+
+
+## fino al 2020 uguale
+## spike 2025-2040
+## 2040-2060 return to 1 new tec
+t = seq(1,15)
+growth = (1-exp(-5/30*(t)))
+growth2 = 1-(1-exp(-5/30*(t)))
+
+t = seq(1,30)
+plot(t,c(growth,growth2))
+
+
+inc_prmat =  p_rmb*growth_rate
+plot(t,inc_prmat,type="l")
+battery_final = (1+inc_prmat*0.5)*battery_cost_vals
+plot(t,battery_final,type="l")
+```
+
+
+```{r}
+df = data.frame(t,value=round(inc_prmat,2))
 df
 gdxdata=write.gdx("data_battery.gdx",list(increase_price_rare_material=df), compress=F)
 mygdx  =gdx("data_battery.gdx")
 ```
+
+
 
 ```{r}
 no_lit <- c("canada","jpnkor","mexico","india","indonesia","mena","sasia","seasia","te","europe", "usa", "brazil", "ssa")
@@ -105,7 +124,6 @@ df
 dataset
 colnames(dataset) <- c("n", "", "Value")
 write.gdx("data_materials.gdx", list(materials = dataset), compress = FALSE)
-
 # crea dataframe con i valori moltiplicativi
 # ogni nazione troverà il suo fattore moltiplicativo di prezzo
 increment <- c(0.5, 0.3, 0.1, 0.6, 1)
