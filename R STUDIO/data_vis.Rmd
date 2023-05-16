@@ -30,14 +30,14 @@ library(countrycode) # Country name tools
 
 # Extract and combine data from different gdx
 ```{r}
-path <- "../../witchmodel"
+path <- "../../Ecc-Project2/results"
 
 
 files <- list.files(path,pattern = ".gdx")
 myfiles <- file.path(path, files)
 myfiles = myfiles %>% str_subset(pattern = "results.*\\.gdx")
 myfiles
-myfiles=myfiles[c(1,2,6,7)]
+#myfiles=myfiles[c(1,2,6,7)]
 myfiles
 
 # TIME
@@ -110,19 +110,20 @@ res
 ```{r}
 vars = c("I_EN", "Q_EN", "MCOST_INV", "K_EN","Q_EMI", "BAU_Q_EMI", 
          "W_EMI","Q_FUEL", "COST_FUEL","MCOST_FUEL","I_OUT", "Q_EMI_OUT",
-         "Q_OUT", "Q_EMI_OUT","Q_OUT","I_RD","TEMP","wcum")
+         "Q_OUT", "Q_EMI_OUT","Q_OUT","I_RD","TEMP","wcum","battery_cost_new")
 
 vars
 
-variable = vars[18]
+variable = vars[19]
 res <- batch_extract(variable, files = myfiles) 
 res = res[[variable]] # move from list to dataframe
 res
-colnames(res)[1] = "V1"
+
 ```
 
 # group by region
 ```{r}
+colnames(res)[1] = "V1"
 res <- res %>%
 group_by(gdx,t,V1) %>%
 summarise(value = sum(value))
@@ -137,7 +138,7 @@ res = res[which(res$V1 == var_chosen1 ),]
 
 # chose subgroup not grouped by region
 ```{r}
-chosen_countrys = c("usa","europe","china")
+chosen_countrys = c("europe","china")
 res = res[which(res$V1 == var_chosen1 & res$n %in% chosen_countrys),]
 ```
 
