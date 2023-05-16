@@ -373,10 +373,6 @@ ELMOTOR_COST.fx(t) $(year(t) ge 2050) = 23 ;
 *100% electrified stock. Stock=limito la quantità K
 
 
-*** newcode 
-*I_EN.up('trad_cars',t,'europe')$(year(t) ge 2035) = 1e-2;
-K_EN.up('trad_cars',t,'europe')$(year(t) ge 2045) = 1e-2;
-****
 
 
 
@@ -385,6 +381,11 @@ K_EN.up(jveh,t,n) = ldv_total(t,n);
 K_EN.fx(jveh,t,n)$((year(t) le 2015) and (not sameas (jveh,'trad_cars'))) = k_veh_2005_2015(jveh,t,n);
 K_EN.lo(jveh,t,n)$((year(t) gt 2015) and (not sameas (jveh,'trad_cars'))) = k_veh_2005_2015(jveh,'3',n);
 I_EN.lo(jveh_inv,t,n)$((year(t) le 2015) and (not sameas (jveh_inv,'trad_cars'))) = 1e-9;
+
+*** newcode 
+*I_EN.up('trad_cars',t,'europe')$(year(t) ge 2035) = 1e-2;
+K_EN.up('trad_cars',t,'europe')$(year(t) ge 2045) = 5;
+****
 
 MCOST_INV.fx(jveh_invfix,t,n) = inv_cost_veh(jveh_invfix)/(reg_discount_veh(n)*1e6);
 MCOST_INV.lo(jveh,t,n)$(not sameas(jveh,'trad_cars')) = 1e-5;
