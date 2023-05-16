@@ -294,8 +294,8 @@ $elseif %phase%=='compute_data'
 
 *** newcode
 battery_cost_new(t,n) = battery_cost(t); #BPU # 2005-2025
-battery_cost_new(t,n)$( year(t) ge 2025 and year(t) le 2040) = (1+pi_lprice*increase_price_rare_material(t))*battery_cost(t);
-battery_cost_new(t,n)$( year(t) ge 2045 and year(t) le 2060) = battery_cost(t);
+*battery_cost_new(t,n)$( year(t) ge 2025 and year(t) le 2040) = (1+pi_lprice*increase_price_rare_material(t))*battery_cost(t);
+*battery_cost_new(t,n)$( year(t) ge 2045 and year(t) le 2060) = battery_cost(t);
 *battery_cost_new(t,n_w_rare_mat) = battery_cost(t);
 ***
 
