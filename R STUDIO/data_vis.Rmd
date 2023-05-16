@@ -36,13 +36,34 @@ path <- "../../Ecc-Project2/results"
 files <- list.files(path,pattern = ".gdx")
 myfiles <- file.path(path, files)
 myfiles = myfiles %>% str_subset(pattern = "results.*\\.gdx")
+#myfiles= str_replace(myfiles,"nperc_incr_","_")
+#myfiles = str_replace(myfiles,"perc_incr_","_")
+#myfiles=myfiles[c(12,13)]
 myfiles
-myfiles=myfiles[c(1,15)]
+
+gdx_bau = myfiles[25]
+#gdx_bau=str_replace(gdx_bau,"ssp2_","")
+gdx_TCB_leg = myfiles[27]
+gdx_BPU_bau = myfiles[1]  
+
+# with BPU
+gdx_CMB_bau = myfiles[5] #26
+gdx_NZ = myfiles[7]
+gdx_NZ_CMB = myfiles[11] #8 12
+
+gdx_TCB = myfiles[13]
+gdx_TCB_CMB = myfiles[17] # 14-18
+gdx_TCB_NZ = myfiles[19]
+gdx_TCB_NZ_CMB = myfiles[23] #20:24
+
+myfiles = c(gdx_NZ,gdx_bau,gdx_TCB,gdx_TCB_CMB)
+# COMPARISONS
+# - CMB tra di loro 
 
 # TIME
 tstep = 5
 first_year = 2000
-max_year = 2150
+max_year = 2100
 ```
 
 ### UTILITY: unique value
@@ -60,7 +81,7 @@ paste0(round((1-res$value[base]/res$value[new])*100,2),"%")
 
 ### battery_cost, emi_bio_harv: only t
 ```{r}
-variable = c("battery_cost")
+variable = c("battery_cost_new")
 
 res <- batch_extract(variable, files = myfiles) 
 res = res[[variable]]
@@ -108,14 +129,14 @@ res
 
 ```{r}
 vars = c("I_EN", "Q_EN", "MCOST_INV", "K_EN","Q_EMI", "BAU_Q_EMI", 
-         "W_EMI","Q_FUEL", "COST_FUEL","MCOST_FUEL","I_OUT", "Q_EMI_OUT",
-         "Q_OUT","Q_OUT","I_RD","TEMP","wcum","battery_cost_new")
+         "W_EMI","Q_FUEL", "COST_FUEL","MCOST_FUEL","I_OUT", "Q_EMI_OUT", #7
+         "Q_OUT","Q_OUT","I_RD","TEMP","wcum","battery_cost_new") #13
 
 vars_chosen = c("Q_EMI", "wcum" #oil
                 )
 vars
 
-variable = vars[16]
+variable = vars[3]
 res <- batch_extract(variable, files = myfiles) 
 res = res[[variable]] # move from list to dataframe
 res
@@ -131,18 +152,24 @@ group_by(gdx,t,V1) %>%
 summarise(value = mean(value))
 res
 unique(res$V1)
+unique(res$gdx)
 ```
 # chose subgroup grouped by region
 ```{r}
-var_chosen1 = "atm"
+colnames(res)[1] = "V1"
+var_chosen1 = "edv"
 res = res[which(res$V1 == var_chosen1 ),]
 res
 ```
 
 # chose subgroup not grouped by region
 ```{r}
-chosen_countrys = c("europe","china")
+colnames(res)[1] = "V1"
+var_chosen1 = "edv"
+chosen_countrys = c("europe")
+res = res[which( res$n %in% chosen_countrys),]
 res = res[which(res$V1 == var_chosen1 & res$n %in% chosen_countrys),]
+res
 ```
 
 
@@ -250,13 +277,13 @@ data <- data %>% mutate(scen = factor(scen, levels = levs))
 plot = ggplot(data %>% filter(year <= max_year),
       aes(x = year, y = value, color = scen)) +
   
-geom_line() +
+geom_line(size=1.2) +
 
 #facet_wrap(~n, ncol = 2, scales='free') +
   
-geom_point() + # NEW GEOMETRY, SAME DATA AND MAPPING
+#geom_point() + # NEW GEOMETRY, SAME DATA AND MAPPING
 
-#geom_hline(yintercept = 0, color = 'Black', size = 0.8) +
+geom_vline(xintercept = 2050, color = 'Black', size = 0.4) +
   
 labs(x = "", y = v, title = v) +
   
@@ -270,36 +297,12 @@ scale_x_continuous(limits=c(first_year+tstep, max_year),
   
 #scale_color_discrete(name = "Scenario")
 scale_color_viridis(name = "Scenario",discrete = TRUE, option = "H")
+plot
 ```
 ```{r}
-ggsave(filename = "battery price.png", plot = plot, width = 15, height = 10, units = "cm") # A4 format
+ggsave(filename = "K_EN_edv.png", plot = plot, width = 15, height = 10, units = "cm") # A4 format
 ```
 
-```{r}
-library(ggplot2)
-
-# Dati di esempio
-x <- c(1, 2, 3, 4, 5)
-y1 <- c(1, 4, 9, 16, 25)
-y2 <- c(1, 2, 4, 8, 16)
-
-# Creazione del dataframe con i dati
-data <- data.frame(x, y1, y2)
-
-# Creazione del ggplot
-plot <- ggplot(data, aes(x = x)) +
-  geom_line(aes(y = y1), color = "red", linetype = "solid", size = 1) +
-  geom_line(aes(y = y2), color = "blue", linetype = "dashed", size = 1) +
-  geom_text(aes(x = 5.2, y = 25, label = "Curva 1"), color = "red", vjust = -0.5) +
-  geom_text(aes(x = 5.2, y = 16, label = "Curva 2"), color = "blue", vjust = -0.5) +
-  xlab("x") +
-  ylab("y") +
-  theme_minimal()
-
-# Visualizzazione del grafico
-print(plot)
-
-```
 
 # area between curves
 ```{r}
@@ -321,20 +324,27 @@ x <- seq(2005,2150,by=5)
 df_combined <- data.frame(x, y_up, y_low)
 
 # Create the plot
-ggplot() +
+plot_curve_region = ggplot() +
   geom_ribbon(data = df_combined, aes(x = x, ymin = y_low, ymax = y_up), 
               fill = "blue", alpha = 0.3) +
-  geom_line(data = df_combined, aes(x = x, y = y_up), color = "red") +
-  geom_line(data = df_combined, aes(x = x, y = y_low), color = "green") +
+  geom_line(data = df_combined, aes(x = x, y = y_up), color = "red",size=1.5) +
+  geom_line(data = df_combined, aes(x = x, y = y_low), color = "green",size=1.5) +
   geom_point() + # NEW GEOMETRY, SAME DATA AND MAPPING
-  labs(x = "", y = v, title = v) +
+  labs(x = "", y = "2005 US$/kWh", title = v) +
   #theme_bw() +
   #theme(axis.text.x = element_text(angle = 45, hjust = 1))+
-  scale_x_continuous(limits=c(first_year+tstep, max_year),
-                    breaks=seq(first_year+tstep, max_year,by = 10)) +
-  scale_color_manual(values = c("red", "green"), labels = c("ssp2_bau", "ssp2_ctax")) +
-  theme(legend.position = "right")
+  scale_x_continuous(limits=c(2010+tstep, 2055),
+                    breaks=seq(2010+tstep, 2055,by = 10)) +
+  scale_color_manual(values = c("red", "green"), labels = scenarios_chosen) +
+  theme(legend.position = "right")+
+  theme_bw()
+
 ```
+```{r}
+
+ggsave(filename ="critical material increase.png", plot = plot_curve_region, width = 15, height = 10, units = "cm") # A4 format
+```
+
 
 # world visual-battery_cost
 ```{r}

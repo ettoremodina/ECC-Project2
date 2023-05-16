@@ -294,9 +294,9 @@ $elseif %phase%=='compute_data'
 
 *** newcode
 battery_cost_new(t,n) = battery_cost(t); #BPU # 2005-2025
-battery_cost_new(t,n)$( year(t) ge 2025 and year(t) le 2040) = (1+pi_lprice*increase_price_rare_material(t))*battery_cost(t);
-battery_cost_new(t,n)$( year(t) ge 2045 and year(t) le 2060) = battery_cost(t);
-battery_cost_new(t,n_w_rare_mat) = battery_cost(t);
+*battery_cost_new(t,n)$( year(t) ge 2025 and year(t) le 2040) = (1+pi_lprice*increase_price_rare_material(t))*battery_cost(t);
+*battery_cost_new(t,n)$( year(t) ge 2045 and year(t) le 2060) = battery_cost(t);
+*battery_cost_new(t,n_w_rare_mat) = battery_cost(t);
 ***
 
 krd0('battery',n) = sum(nn,krd0('en',nn))*0.0141*0.076923077;
@@ -374,7 +374,8 @@ ELMOTOR_COST.fx(t) $(year(t) ge 2050) = 23 ;
 
 
 *** newcode 
-I_EN.up('trad_cars',t,'europe')$(year(t) ge 2035) = 1e-2;
+*I_EN.up('trad_cars',t,'europe')$(year(t) ge 2035) = 1e-2;
+K_EN.up('trad_cars',t,'europe')$(year(t) ge 2045) = 1e-2;
 ****
 
 
@@ -405,8 +406,8 @@ K_EN.fx('battery',t,n) = 0;
 Q_EN.fx('battery',t,n) = 0;
 
 
-MCOST_INV.up('battery',t,n)$(not tfix(t)) = battery_cost_new(tfirst,n);
-MCOST_INV.fx('battery',t,n)$((not tfix(t)) and (year(t) lt rd_time('battery','start'))) = battery_cost_new(t,n);
+MCOST_INV.up('battery',t,n)$(not tfix(t)) = battery_cost_new(tfirst,n);battery_cost_new
+MCOST_INV.fx('battery',t,n)$((not tfix(t)) and (year(t) lt rd_time('battery','start'))) = (t,n);
 MCOST_INV.fx('hybrid',t,n)$((not tfix(t)) and (year(t) lt rd_time('battery','start'))) = (glider_manufacture_cost+(size_battery('hybrid',n)*battery_cost_new(t,n)*bat_multip('hybrid',n)
  + ELMOTOR_COST.l(t)*size_elmotor('hybrid') + ice_cost*size_ice('hybrid') + tank_cost('hybrid')))/(1e6);
 MCOST_INV.fx('plg_hybrid',t,n)$((not tfix(t)) and (year(t) lt rd_time('battery','start'))) = (glider_manufacture_cost + (size_battery('plg_hybrid',n)*battery_cost_new(t,n)*bat_multip('plg_hybrid',n)
@@ -424,14 +425,14 @@ eqmcost_inv_hybrid_%clt%
 eqmcost_inv_plghybrid_%clt%
 eqmcost_inv_edv_%clt%
 *** newcode
-eqq_inv_red_ban_%clt%
+*eqq_inv_red_ban_%clt%
 ***
 *-------------------------------------------------------------------------------
 $elseif %phase%=='eqs'
 
 *** newcode
-eqq_inv_red_ban_%clt%(t,n)$(mapn_th('%clt%') and (year(t) ge 2035))..
-   I_EN('trad_cars',t,'usa') =l= 0.75*I_EN('trad_cars','6','usa');
+*eqq_inv_red_ban_%clt%(t,n)$(mapn_th('%clt%') and (year(t) ge 2035))..
+*   I_EN('trad_cars',t,'usa') =l= 0.75*I_EN('trad_cars','6','usa');
 
 
 ***
