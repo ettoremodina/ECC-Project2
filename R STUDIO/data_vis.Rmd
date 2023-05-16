@@ -37,8 +37,7 @@ files <- list.files(path,pattern = ".gdx")
 myfiles <- file.path(path, files)
 myfiles = myfiles %>% str_subset(pattern = "results.*\\.gdx")
 myfiles
-#myfiles=myfiles[c(1,2,6,7)]
-myfiles
+myfiles=myfiles[c(1,15)]
 
 # TIME
 tstep = 5
@@ -110,11 +109,13 @@ res
 ```{r}
 vars = c("I_EN", "Q_EN", "MCOST_INV", "K_EN","Q_EMI", "BAU_Q_EMI", 
          "W_EMI","Q_FUEL", "COST_FUEL","MCOST_FUEL","I_OUT", "Q_EMI_OUT",
-         "Q_OUT", "Q_EMI_OUT","Q_OUT","I_RD","TEMP","wcum","battery_cost_new")
+         "Q_OUT","Q_OUT","I_RD","TEMP","wcum","battery_cost_new")
 
+vars_chosen = c("Q_EMI", "wcum" #oil
+                )
 vars
 
-variable = vars[19]
+variable = vars[16]
 res <- batch_extract(variable, files = myfiles) 
 res = res[[variable]] # move from list to dataframe
 res
@@ -126,14 +127,16 @@ res
 colnames(res)[1] = "V1"
 res <- res %>%
 group_by(gdx,t,V1) %>%
-summarise(value = sum(value))
+#summarise(value = sum(value))
+summarise(value = mean(value))
 res
 unique(res$V1)
 ```
 # chose subgroup grouped by region
 ```{r}
-var_chosen1 = "battery"
+var_chosen1 = "atm"
 res = res[which(res$V1 == var_chosen1 ),]
+res
 ```
 
 # chose subgroup not grouped by region
@@ -202,7 +205,7 @@ res
 unique(res$V1)
 unique(res$V2)
 
-var_chosen1 = "trad_cars"
+var_chosen1 = "oil"
 var_chosen2 = "trad_cars"
 res = res[which(res$V1 == var_chosen1 &res$V2 == var_chosen2),]
 ```
@@ -241,14 +244,15 @@ mutate(scen = str_replace(scen, ".gdx", "")) %>%
 mutate(scen = str_replace(scen, "results_", ""))
 
 levs = unique(data$scen)
+#levs = c("price_update","default")
 data <- data %>% mutate(scen = factor(scen, levels = levs))
 
-ggplot(data %>% filter(year <= max_year),
+plot = ggplot(data %>% filter(year <= max_year),
       aes(x = year, y = value, color = scen)) +
   
 geom_line() +
 
-#facet_wrap(~n, ncol = 3, scales='free') +
+#facet_wrap(~n, ncol = 2, scales='free') +
   
 geom_point() + # NEW GEOMETRY, SAME DATA AND MAPPING
 
@@ -265,7 +269,36 @@ scale_x_continuous(limits=c(first_year+tstep, max_year),
 #scale_y_continuous(limits=c(-5, 50)) +
   
 #scale_color_discrete(name = "Scenario")
-scale_color_viridis(name = "Scenario",discrete = TRUE, option = "D")
+scale_color_viridis(name = "Scenario",discrete = TRUE, option = "H")
+```
+```{r}
+ggsave(filename = "battery price.png", plot = plot, width = 15, height = 10, units = "cm") # A4 format
+```
+
+```{r}
+library(ggplot2)
+
+# Dati di esempio
+x <- c(1, 2, 3, 4, 5)
+y1 <- c(1, 4, 9, 16, 25)
+y2 <- c(1, 2, 4, 8, 16)
+
+# Creazione del dataframe con i dati
+data <- data.frame(x, y1, y2)
+
+# Creazione del ggplot
+plot <- ggplot(data, aes(x = x)) +
+  geom_line(aes(y = y1), color = "red", linetype = "solid", size = 1) +
+  geom_line(aes(y = y2), color = "blue", linetype = "dashed", size = 1) +
+  geom_text(aes(x = 5.2, y = 25, label = "Curva 1"), color = "red", vjust = -0.5) +
+  geom_text(aes(x = 5.2, y = 16, label = "Curva 2"), color = "blue", vjust = -0.5) +
+  xlab("x") +
+  ylab("y") +
+  theme_minimal()
+
+# Visualizzazione del grafico
+print(plot)
+
 ```
 
 # area between curves
@@ -280,10 +313,10 @@ mutate(scen = str_replace(scen, "results_", ""))
 levs = unique(data$scen)
 data <- data %>% mutate(scen = factor(scen, levels = levs))
 
-## group regiondata into worlddata
-#data <- data %>% group_by(scen,year) %>% summarise(value = sum(value))
-y_up <- data[data$scen=='ssp2_bau',]$value  
-y_low <- data[data$scen=='ssp2_ctax',]$value
+scenarios_chosen = c("BPU_TCB_CMBnperc_incr_7","BPU_TCB_CMBnperc_incr_50")
+
+y_up <- data[data$scen==scenarios_chosen[1],]$value  
+y_low <- data[data$scen==scenarios_chosen[2],]$value
 x <- seq(2005,2150,by=5)
 df_combined <- data.frame(x, y_up, y_low)
 
