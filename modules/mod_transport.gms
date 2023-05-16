@@ -424,7 +424,7 @@ eqmcost_inv_hybrid_%clt%
 eqmcost_inv_plghybrid_%clt%
 eqmcost_inv_edv_%clt%
 *** newcode
-eqq_inv_red_ban_%clt%
+*eqq_inv_red_ban_%clt%
 ***
 *-------------------------------------------------------------------------------
 $elseif %phase%=='eqs'

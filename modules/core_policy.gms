@@ -58,7 +58,7 @@ parameter ctax(ghg,t,n) 'Carbon tax [T$/GTonC]';
 
 *-------------------------------------------------------------------------------
 *** newcode
-$elseif %phase%=='vars'
+*$elseif %phase%=='vars'
 *Q_EMI.up('co2',t,n)$(year(t) gt 2030 and sameas(n,"europe")) = 0.6705;
 *Q_EMI.up('co2',t,n)$(year(t) gt 2030 and sameas(n,"usa")) = 0.7162;
 
