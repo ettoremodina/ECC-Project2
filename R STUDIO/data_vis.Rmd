@@ -158,8 +158,8 @@ unique(res$gdx)
 # chose subgroup grouped by region
 ```{r}
 colnames(res)[1] = "V1"
-var_chosen1 = "edv"
-res = res[which(res$V1 == var_chosen1 ),]
+var_chosen1 = c("edv","plg_hybrid","trad_cars","hybrid")
+res = res[which(res$V1 %in% var_chosen1 ),]
 res
 ```
 
@@ -172,7 +172,17 @@ res = res[which( res$n %in% chosen_countrys),]
 res = res[which(res$V1 == var_chosen1 & res$n %in% chosen_countrys),]
 res
 ```
+# piechart
+```{r}
+library(RColorBrewer)
+myPalette <- brewer.pal(5, "Set2") 
 
+res_time = res[which(res$t==6),]
+res_time_gdx = res_time[which(res_time$gdx==gdx_TCB_KEN),]
+
+pie(res_time_gdx$value,label=res_time_gdx$V1,col=myPalette)
+  
+```
 
 
 jinv-t-n
@@ -303,6 +313,10 @@ plot
 ```{r}
 ggsave(filename = "K_EN_edv.png", plot = plot, width = 15, height = 10, units = "cm") # A4 format
 ```
+```{r}
+
+```
+
 
 
 # area between curves

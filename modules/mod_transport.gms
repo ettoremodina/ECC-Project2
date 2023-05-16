@@ -294,9 +294,9 @@ $elseif %phase%=='compute_data'
 
 *** newcode
 battery_cost_new(t,n) = battery_cost(t); #BPU # 2005-2025
-*battery_cost_new(t,n)$( year(t) ge 2025 and year(t) le 2040) = (1+pi_lprice*increase_price_rare_material(t))*battery_cost(t);
-*battery_cost_new(t,n)$( year(t) ge 2045 and year(t) le 2060) = battery_cost(t);
-*battery_cost_new(t,n_w_rare_mat) = battery_cost(t);
+battery_cost_new(t,n)$( year(t) ge 2025 and year(t) le 2040) = (1+pi_lprice*increase_price_rare_material(t))*battery_cost(t);
+battery_cost_new(t,n)$( year(t) ge 2045 and year(t) le 2060) = battery_cost(t);
+battery_cost_new(t,n_w_rare_mat) = battery_cost(t);
 ***
 
 krd0('battery',n) = sum(nn,krd0('en',nn))*0.0141*0.076923077;
@@ -384,7 +384,7 @@ I_EN.lo(jveh_inv,t,n)$((year(t) le 2015) and (not sameas (jveh_inv,'trad_cars'))
 
 *** newcode 
 *I_EN.up('trad_cars',t,'europe')$(year(t) ge 2035) = 1e-2;
-K_EN.up('trad_cars',t,'europe')$(year(t) ge 2045) = 50;
+*K_EN.up('trad_cars',t,'europe')$(year(t) ge 2045) = 50;
 ****
 
 MCOST_INV.fx(jveh_invfix,t,n) = inv_cost_veh(jveh_invfix)/(reg_discount_veh(n)*1e6);
