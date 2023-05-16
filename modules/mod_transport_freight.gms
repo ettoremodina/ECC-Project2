@@ -149,12 +149,12 @@ Q_IN.fx('trbiofuel','neltrbiofuel',t,n) = 1e-12;
 
 MCOST_INV.fx(jfrt_invfix,t,n) = inv_cost_frt(jfrt_invfix)/(reg_discount_veh(n)*1e6);
 MCOST_INV.lo(jfrt,t,n)$(not sameas (jfrt,'trad_stfr')) = 1e-5;
-MCOST_INV.up(jfrt,t,n)$(not sameas (jfrt,'trad_stfr')) = (inv_cost_frt('trad_stfr')+5*size_battery_freight(jfrt,n)*battery_cost(tfirst)+disutility_costs_stfr(jfrt,t,n))/1e6;
-MCOST_INV.l(jfrt,t,n)$(not sameas (jfrt,'trad_stfr')) = (inv_cost_frt('trad_stfr')+size_battery_freight(jfrt,n)*battery_cost(tfirst))/1e6;
+MCOST_INV.up(jfrt,t,n)$(not sameas (jfrt,'trad_stfr')) = (inv_cost_frt('trad_stfr')+5*size_battery_freight(jfrt,n)*battery_cost_new(tfirst,n)+disutility_costs_stfr(jfrt,t,n))/1e6;
+MCOST_INV.l(jfrt,t,n)$(not sameas (jfrt,'trad_stfr')) = (inv_cost_frt('trad_stfr')+size_battery_freight(jfrt,n)*battery_cost_new(tfirst,n))/1e6;
 
-MCOST_INV.fx('hbd_stfr',t,n)$(year(t) lt rd_time('battery','start')) = (inv_cost_frt('trad_stfr')+(size_battery_freight('hbd_stfr',n)*battery_cost(t)*1.7)+disutility_costs_stfr('hbd_stfr',t,n))/(reg_discount_veh(n)*1e6);
-MCOST_INV.fx('plg_hbd_stfr',t,n)$(year(t) lt rd_time('battery','start')) = (inv_cost_frt('trad_stfr')+(size_battery_freight('plg_hbd_stfr',n)*battery_cost(t)*1.7)+disutility_costs_stfr('plg_hbd_stfr',t,n))/1e6;
-MCOST_INV.fx('edv_stfr',t,n)$(year(t) lt rd_time('battery','start')) = (inv_cost_frt('trad_stfr')*0.8+size_battery_freight('edv_stfr',n)*battery_cost(t)*1.7+disutility_costs_stfr('edv_stfr',t,n))/1e6;
+MCOST_INV.fx('hbd_stfr',t,n)$(year(t) lt rd_time('battery','start')) = (inv_cost_frt('trad_stfr')+(size_battery_freight('hbd_stfr',n)*battery_cost_new(t,n)*1.7)+disutility_costs_stfr('hbd_stfr',t,n))/(reg_discount_veh(n)*1e6);
+MCOST_INV.fx('plg_hbd_stfr',t,n)$(year(t) lt rd_time('battery','start')) = (inv_cost_frt('trad_stfr')+(size_battery_freight('plg_hbd_stfr',n)*battery_cost_new(t,n)*1.7)+disutility_costs_stfr('plg_hbd_stfr',t,n))/1e6;
+MCOST_INV.fx('edv_stfr',t,n)$(year(t) lt rd_time('battery','start')) = (inv_cost_frt('trad_stfr')*0.8+size_battery_freight('edv_stfr',n)*battery_cost_new(t,n)*1.7+disutility_costs_stfr('edv_stfr',t,n))/1e6;
 
 *-------------------------------------------------------------------------------
 $elseif %phase%=='policy'
