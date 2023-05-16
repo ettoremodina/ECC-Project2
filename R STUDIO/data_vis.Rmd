@@ -49,110 +49,95 @@ first_year = 2000
 max_year = 2100
 ```
 
-### UTILITY: unique value
-```{r}
-variable = c("UTILITY")
-res <- batch_extract(variable, files = myfiles) 
-res = res[[variable]]
-res
+I_EN
+(trad_cars, hybrid, plg_hybrid, edv; elwindon, elwindoff, elpv; ???)
 
-base = 1
-new = 3
-paste0(round((1-res$value[base]/res$value[new])*100,2),"%")
+Q_EN
+trad_cars, hybrid, plg_hybrid, edv; elwindon, elwindoff, elpv; ???)
 
-```
+MCOST_INV, K_EN
+trad_cars, hybrid, plg_hybrid, edv; elwindon, elwindoff, elpv;
 
-### battery_cost, emi_bio_harv: only t
-```{r}
-variable = c("battery_cost_new")
 
-res <- batch_extract(variable, files = myfiles) 
-res = res[[variable]]
-res
+Q_FUEL, COST_FUEL,MCOST_FUEL
+trbiofuel; advbiofuel; ?
+I_OUT: oil, Q_EMI_OUT, Q_OUT, Q_EMI_OUT,Q_OUT
+I_RD: battery, K_RD
+Q_IN
+(trad_cars, hybrid, plg_hybrid, edv; elwindon, elwindoff, elpv; ???)
 
-#res = res[which( res$n %in% c("china","usa")),]
 
-```
 
-# data-diff
-```{r}
-
-gdxs = unique(res$gdx)
-data_diff = res[res$gdx==gdxs[2],"value"]-res[res$gdx==gdxs[1],"value"]
-data_perc = data_diff/res[res$gdx==gdxs[1],"value"]
-plot(data_diff,type="b",pch=16)
-plot(data_perc,type="b",pch=16)
-```
-
-### FPRICE: fuel-t
-```{r}
-variable = c("FPRICE")
-res <- batch_extract(variable, files = myfiles) 
-res = res[[variable]]
-res
- 
-```
-
-### I_EN_GRID, K_EN_GRID, battery_cost_new, co2_transport, tpes: : t-n
-```{r}
-variable = c("K_EN_GRID")
-res <- batch_extract(variable, files = myfiles) 
-res = res[[variable]]
-res
- 
-```
-# group by region
-```{r}
-res <- res %>%
-group_by(gdx,t) %>%
-summarise(value = sum(value))
-res
-```
-# X-t-n
+# VAR CHOICE
 
 ```{r}
 vars = c("I_EN", "Q_EN", "MCOST_INV", "K_EN","Q_EMI", "BAU_Q_EMI", 
          "W_EMI","Q_FUEL", "COST_FUEL","MCOST_FUEL","I_OUT", "Q_EMI_OUT", #7
          "Q_OUT","Q_OUT","I_RD","TEMP","wcum","battery_cost_new") #13
+othervars = c("I_EN_GRID", "K_EN_GRID", "battery_cost_new", "co2_transport", "tpes")
 
-vars_chosen = c("Q_EMI", "wcum" #oil
-                )
-vars
+vars2 = c("Q_IN","WCUM_EMI","W_E","QEL_OUT","FPRICE","battery_cost", "battery_cost_new",
+          "emi_bio_harv","I_RD","K_RD","UTILITY")
 
 variable = vars[4]
-res <- batch_extract(variable, files = myfiles) 
-res = res[[variable]] # move from list to dataframe
-res
+results <- batch_extract(variable, files = myfiles) 
+results = results[[variable]] # move from list to dataframe
+results
 
 ```
 
-# group by region
+# group by region2
 ```{r}
+res = results
+
 colnames(res)[1] = "V1"
+unique(res$V1)
+
+var_chosen1 = c("edv","plg_hybrid","trad_cars","hybrid")
+res = res[which(res$V1 %in% var_chosen1 ),]
+
+
+chosen_countrys = c("europe")
+res = res[which( res$n %in% chosen_countrys),]
+
+colnames(res)[2] = "V2"
+var_chosen2 = c("edv","plg_hybrid","trad_cars","hybrid")
+res = res[which(res$V2 %in% var_chosen1 ),]
+
+res <- res %>%
+group_by(gdx,t) %>%
+summarise(value = sum(value))
+res
+
 res <- res %>%
 group_by(gdx,t,V1) %>%
 summarise(value = sum(value))
 #summarise(value = mean(value))
 res
-unique(res$V1)
+
+res <- res %>%
+group_by(gdx,t,V1,V2) %>%
+summarise(value = sum(value))
+#summarise(value = mean(value))
+res
+
+
+
 unique(res$gdx)
 ```
-# chose subgroup grouped by region
+# perc diff
 ```{r}
-colnames(res)[1] = "V1"
-var_chosen1 = c("edv","plg_hybrid","trad_cars","hybrid")
-res = res[which(res$V1 %in% var_chosen1 ),]
-res
+base = 1
+new = 3
+paste0(round((1-res$value[base]/res$value[new])*100,2),"%")
 ```
-
-# chose subgroup not grouped by region
+# data-diff
 ```{r}
-colnames(res)[1] = "V1"
-var_chosen1 = "battery"
-chosen_countrys = c("europe")
-res = res[which( res$n %in% chosen_countrys),]
-res = res[which(res$V1 == var_chosen1 & res$n %in% chosen_countrys),]
-res
+gdxs = unique(res$gdx)
+data_diff = res[res$gdx==gdxs[2],"value"]-res[res$gdx==gdxs[1],"value"]
+data_perc = data_diff/res[res$gdx==gdxs[1],"value"]
+plot(data_diff,type="b",pch=16)
+plot(data_perc,type="b",pch=16)
 ```
 # piechart
 ```{r}
@@ -166,102 +151,17 @@ pie(res_time_gdx$value,label=res_time_gdx$V1,col=myPalette)
   
 ```
 
-
-jinv-t-n
-I_EN
-(trad_cars, hybrid, plg_hybrid, edv; elwindon, elwindoff, elpv; ???)
-
-
-j-t-n
-Q_EN
-trad_cars, hybrid, plg_hybrid, edv; elwindon, elwindoff, elpv; ???)
-
-jreal -t-n
-MCOST_INV, K_EN
-trad_cars, hybrid, plg_hybrid, edv; elwindon, elwindoff, elpv;
-
-
-e-t-n
-Q_EMI, BAU_Q_EMI, W_EMI
-
-fuel -t -n 
-Q_FUEL, COST_FUEL,MCOST_FUEL
-trbiofuel; advbiofuel; ?
-
-
-f-t-n
-I_OUT: oil, Q_EMI_OUT, Q_OUT, Q_EMI_OUT,Q_OUT
-
-rd-t-n
-I_RD: battery, K_RD
-
-m-t-n
-TEMP 
-
-
-# X-Y-t-n
+# last data transform
 ```{r}
-vars2 = c("Q_IN","WCUM_EMI","W_E","QEL_OUT")
-
-vars2
-
-variable = vars2[1]
-res <- batch_extract(variable, files = myfiles) 
-res = res[[variable]] # move from list to dataframe
-res
-colnames(res)[1] = "V1"
-colnames(res)[2] = "V2"
-```
-
-# group by region
-```{r}
-res <- res %>%
-group_by(gdx,t,V1,V2) %>%
-summarise(value = sum(value))
-res
-```
-# chose subgroup grouped by region
-```{r}
-unique(res$V1)
-unique(res$V2)
-
-var_chosen1 = "oil"
-var_chosen2 = "trad_cars"
-res = res[which(res$V1 == var_chosen1 &res$V2 == var_chosen2),]
-```
-
-# chose subgroup not grouped by region
-```{r}
-chosen_countrys = c("usa","europe","china")
-res = res[which(res$V1 == var_chosen1 & res$V2 == var_chosen2 & res$n %in% chosen_countrys),]
-
-```
-
-fuel-jfed-t-n
-Q_IN
-(trad_cars, hybrid, plg_hybrid, edv; elwindon, elwindoff, elpv; ???)
-
-e-m-t-n
-WCUM_EMI,W_EMI
-
-el_out-ices_el-t-n
-QEL_OUT
-
-
-
-# ###########################################################
-# MAIN PLOTTER
-```{r}
-v = variable # rename for semplicity
 data = res %>% as_tibble()
 
 data <- data %>%
 # Transform time period into year, t0 and tsep could be different
-mutate(year = as.numeric(t) * tstep + first_year) %>% 
-# Transform the filename into a scenario name
-mutate(scen = basename(gdx)) %>% 
-mutate(scen = str_replace(scen, ".gdx", "")) %>%
-mutate(scen = str_replace(scen, "results_", ""))
+  mutate(year = as.numeric(t) * tstep + first_year) %>% 
+  # Transform the filename into a scenario name
+  mutate(scen = basename(gdx)) %>% 
+  mutate(scen = str_replace(scen, ".gdx", "")) %>%
+  mutate(scen = str_replace(scen, "results_", ""))
 
 levs = unique(data$scen)
 levs2 = unique(data$V1)
@@ -269,6 +169,11 @@ levs2 = unique(data$V1)
 data <- data %>% mutate(scen = factor(scen, levels = levs))
 data <- data %>% mutate(V1 = factor(V1, levels = levs2))
 
+data
+```
+
+# MAIN PLOTTER
+```{r}
 plot = ggplot(data %>% filter(year <= max_year),
       aes(x = year, y = value, color = V1)) +
   
@@ -280,7 +185,7 @@ facet_wrap(~scen, ncol = 2, scales='free') +
 
 geom_vline(xintercept = 2050, color = 'Black', size = 0.4) +
   
-labs(x = "", y = v, title = v) +
+labs(x = "", y = variable, title = variable) +
   
 theme_bw() +
 theme(axis.text.x = element_text(angle = 45, hjust = 1))+
@@ -294,13 +199,10 @@ scale_x_continuous(limits=c(first_year+tstep, max_year),
 scale_color_viridis(name = "Scenario",discrete = TRUE, option = "H")
 plot
 ```
+#save plot
 ```{r}
 ggsave(filename = "K_EN_edv.png", plot = plot, width = 15, height = 10, units = "cm") # A4 format
 ```
-```{r}
-
-```
-
 
 
 # area between curves
@@ -339,6 +241,7 @@ plot_curve_region = ggplot() +
   theme_bw()
 
 ```
+# save plot
 ```{r}
 
 ggsave(filename ="critical material increase.png", plot = plot_curve_region, width = 15, height = 10, units = "cm") # A4 format
@@ -377,7 +280,7 @@ world1$color_category <- ifelse(world1$value > 700, "In posess of rare material"
 
 ```
 
-
+# other
 ```{r}
 
 # Plot the map with discrete colors
