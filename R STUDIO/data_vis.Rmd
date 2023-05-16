@@ -38,26 +38,8 @@ myfiles <- file.path(path, files)
 myfiles = myfiles %>% str_subset(pattern = "results.*\\.gdx")
 #myfiles= str_replace(myfiles,"nperc_incr_","_")
 #myfiles = str_replace(myfiles,"perc_incr_","_")
-#myfiles=myfiles[c(12,13)]
+
 myfiles
-
-gdx_bau = myfiles[25]
-#gdx_bau=str_replace(gdx_bau,"ssp2_","")
-gdx_TCB_leg = myfiles[26]
-gdx_BPU_bau = myfiles[1]  
-
-# with BPU
-gdx_CMB_bau = myfiles[5] #26
-gdx_NZ = myfiles[7]
-gdx_NZ_CMB = myfiles[11] #8 12
-
-gdx_TCB = myfiles[13]
-gdx_TCB_CMB = myfiles[17] # 14-18
-gdx_TCB_NZ = myfiles[19]
-gdx_TCB_NZ_CMB = myfiles[23] #20:24
-gdx_TCB_KEN = myfiles[27]
-
-myfiles = c(gdx_NZ,gdx_bau,gdx_TCB_KEN,gdx_TCB_CMB)
 # COMPARISONS
 # - CMB tra di loro 
 
@@ -149,8 +131,8 @@ res
 colnames(res)[1] = "V1"
 res <- res %>%
 group_by(gdx,t,V1) %>%
-#summarise(value = sum(value))
-summarise(value = mean(value))
+summarise(value = sum(value))
+#summarise(value = mean(value))
 res
 unique(res$V1)
 unique(res$gdx)
@@ -166,7 +148,7 @@ res
 # chose subgroup not grouped by region
 ```{r}
 colnames(res)[1] = "V1"
-var_chosen1 = "trad_cars"
+var_chosen1 = "battery"
 chosen_countrys = c("europe")
 res = res[which( res$n %in% chosen_countrys),]
 res = res[which(res$V1 == var_chosen1 & res$n %in% chosen_countrys),]
@@ -282,15 +264,17 @@ mutate(scen = str_replace(scen, ".gdx", "")) %>%
 mutate(scen = str_replace(scen, "results_", ""))
 
 levs = unique(data$scen)
-#levs = c("price_update","default")
+levs2 = unique(data$V1)
+
 data <- data %>% mutate(scen = factor(scen, levels = levs))
+data <- data %>% mutate(V1 = factor(V1, levels = levs2))
 
 plot = ggplot(data %>% filter(year <= max_year),
-      aes(x = year, y = value, color = scen)) +
+      aes(x = year, y = value, color = V1)) +
   
 geom_line(size=1.2) +
 
-#facet_wrap(~n, ncol = 2, scales='free') +
+facet_wrap(~scen, ncol = 2, scales='free') +
   
 #geom_point() + # NEW GEOMETRY, SAME DATA AND MAPPING
 
