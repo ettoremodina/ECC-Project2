@@ -384,7 +384,7 @@ I_EN.lo(jveh_inv,t,n)$((year(t) le 2015) and (not sameas (jveh_inv,'trad_cars'))
 
 *** newcode 
 *I_EN.up('trad_cars',t,'europe')$(year(t) ge 2035) = 1e-2;
-K_EN.up('trad_cars',t,'europe')$(year(t) ge 2045) = 5;
+K_EN.up('trad_cars',t,'europe')$(year(t) ge 2045) = 10;
 ****
 
 MCOST_INV.fx(jveh_invfix,t,n) = inv_cost_veh(jveh_invfix)/(reg_discount_veh(n)*1e6);

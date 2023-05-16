@@ -43,7 +43,7 @@ myfiles
 
 gdx_bau = myfiles[25]
 #gdx_bau=str_replace(gdx_bau,"ssp2_","")
-gdx_TCB_leg = myfiles[27]
+gdx_TCB_leg = myfiles[26]
 gdx_BPU_bau = myfiles[1]  
 
 # with BPU
@@ -55,8 +55,9 @@ gdx_TCB = myfiles[13]
 gdx_TCB_CMB = myfiles[17] # 14-18
 gdx_TCB_NZ = myfiles[19]
 gdx_TCB_NZ_CMB = myfiles[23] #20:24
+gdx_TCB_KEN = myfiles[27]
 
-myfiles = c(gdx_NZ,gdx_bau,gdx_TCB,gdx_TCB_CMB)
+myfiles = c(gdx_NZ,gdx_bau,gdx_TCB_KEN,gdx_TCB_CMB)
 # COMPARISONS
 # - CMB tra di loro 
 
@@ -136,7 +137,7 @@ vars_chosen = c("Q_EMI", "wcum" #oil
                 )
 vars
 
-variable = vars[3]
+variable = vars[4]
 res <- batch_extract(variable, files = myfiles) 
 res = res[[variable]] # move from list to dataframe
 res
@@ -165,7 +166,7 @@ res
 # chose subgroup not grouped by region
 ```{r}
 colnames(res)[1] = "V1"
-var_chosen1 = "edv"
+var_chosen1 = "trad_cars"
 chosen_countrys = c("europe")
 res = res[which( res$n %in% chosen_countrys),]
 res = res[which(res$V1 == var_chosen1 & res$n %in% chosen_countrys),]
