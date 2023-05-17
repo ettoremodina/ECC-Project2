@@ -36,13 +36,22 @@ path <- "../../Ecc-Project2/results"
 files <- list.files(path,pattern = ".gdx")
 myfiles <- file.path(path, files)
 myfiles = myfiles %>% str_subset(pattern = "results.*\\.gdx")
-#myfiles= str_replace(myfiles,"nperc_incr_","_")
-#myfiles = str_replace(myfiles,"perc_incr_","_")
+
 
 myfiles
-# COMPARISONS
-# - CMB tra di loro 
 
+gdx_bau = list.files(path,pattern = "bau")
+gdx_NZ = list.files(path,pattern = "NZ.gdx")
+gdx_TCB = list.files(path,pattern = "TCB.gdx")
+gdx_NZ_ssp = list.files(path,pattern = "NZ_tfpscen")
+gdx_BPU_ssp = list.files(path,pattern = "BPU_tfpscen")
+
+myfiles = c(gdx_NZ,gdx_bau,gdx_TCB)
+for ( i in 1:length(myfiles)){
+  myfiles[i] = paste0( "../../Ecc-Project2/results/",myfiles[i])
+}
+
+myfiles
 # TIME
 tstep = 5
 first_year = 2000
@@ -79,14 +88,14 @@ othervars = c("I_EN_GRID", "K_EN_GRID", "battery_cost_new", "co2_transport", "tp
 vars2 = c("Q_IN","WCUM_EMI","W_E","QEL_OUT","FPRICE","battery_cost", "battery_cost_new",
           "emi_bio_harv","I_RD","K_RD","UTILITY")
 
-variable = vars[4]
+variable = "K_EN"
 results <- batch_extract(variable, files = myfiles) 
 results = results[[variable]] # move from list to dataframe
 results
 
 ```
 
-# group by region2
+# group 
 ```{r}
 res = results
 
@@ -94,10 +103,14 @@ colnames(res)[1] = "V1"
 unique(res$V1)
 
 var_chosen1 = c("edv","plg_hybrid","trad_cars","hybrid")
+var_chosen1 = c("battery")
+var_chosen1 = c("oil","trbiofuel","advbiofuel")
+var_chosen1 = c("co2")
+var_chosen1 = c("atm")
 res = res[which(res$V1 %in% var_chosen1 ),]
+res
 
-
-chosen_countrys = c("europe")
+chosen_countrys = c("usa")
 res = res[which( res$n %in% chosen_countrys),]
 
 colnames(res)[2] = "V2"
@@ -111,8 +124,8 @@ res
 
 res <- res %>%
 group_by(gdx,t,V1) %>%
-summarise(value = sum(value))
-#summarise(value = mean(value))
+#summarise(value = sum(value))
+summarise(value = mean(value))
 res
 
 res <- res %>%
@@ -139,17 +152,7 @@ data_perc = data_diff/res[res$gdx==gdxs[1],"value"]
 plot(data_diff,type="b",pch=16)
 plot(data_perc,type="b",pch=16)
 ```
-# piechart
-```{r}
-library(RColorBrewer)
-myPalette <- brewer.pal(5, "Set2") 
 
-res_time = res[which(res$t==6),]
-res_time_gdx = res_time[which(res_time$gdx==gdx_TCB_KEN),]
-
-pie(res_time_gdx$value,label=res_time_gdx$V1,col=myPalette)
-  
-```
 
 # last data transform
 ```{r}
@@ -168,24 +171,63 @@ levs2 = unique(data$V1)
 
 data <- data %>% mutate(scen = factor(scen, levels = levs))
 data <- data %>% mutate(V1 = factor(V1, levels = levs2))
+data$scen
 
 data
 ```
+# piechart
+```{r}
+library(RColorBrewer)
+myPalette <- brewer.pal(5, "Set2") 
 
+data_time = data[which(data$t==8),]
+
+piechart = ggplot(data_time, aes(x=" ", y=value, fill=V1)) +
+  geom_bar(stat="identity", width=1) +
+  coord_polar("y", start=0)+
+  facet_wrap(~scen, ncol = 2)+
+    labs(x = " ",  title = "Veichle Fleet CM-usa-2040") 
+piechart
+```
+#save plot
+```{r}
+ggsave(filename = "Veichle Fleet-USA-cm-2040.png", plot = piechart, width = 15, height = 10, units = "cm") # A4 format
+```
+
+#areaplot
+```{r}
+areaplot = ggplot(data, aes(x=year, y=value, fill=V1)) + 
+    geom_area()+
+  facet_wrap(~scen, ncol = 3, scales='fixed') +
+scale_x_continuous(limits=c(first_year+tstep, max_year),
+                    breaks=seq(first_year+tstep, max_year,by = 15)) +
+  labs(x = "", y = "TWh", title = paste0(variable,"-world")) +
+  theme(axis.text.x = element_text(angle = 45, hjust = 1))
+areaplot
+  
+```
+
+#save plot
+```{r}
+ggsave(filename = "Q_FUEL-world.png", plot = areaplot, width = 15, height = 10, units = "cm") # A4 format
+```
 # MAIN PLOTTER
 ```{r}
 plot = ggplot(data %>% filter(year <= max_year),
-      aes(x = year, y = value, color = V1)) +
+      aes(x = year, y = value, color = scen)) +
+  
+#lot = ggplot(data %>% filter(year <= max_year),
+#      aes(x = year, y = value, color = V1)) +
   
 geom_line(size=1.2) +
 
-facet_wrap(~scen, ncol = 2, scales='free') +
+#facet_wrap(~scen, ncol = 2, scales='free') +
   
 #geom_point() + # NEW GEOMETRY, SAME DATA AND MAPPING
 
 geom_vline(xintercept = 2050, color = 'Black', size = 0.4) +
   
-labs(x = "", y = variable, title = variable) +
+labs(x = "", y = "°C", title = paste0(variable," increase respect to pre-industrial levels")) +
   
 theme_bw() +
 theme(axis.text.x = element_text(angle = 45, hjust = 1))+
@@ -201,7 +243,7 @@ plot
 ```
 #save plot
 ```{r}
-ggsave(filename = "K_EN_edv.png", plot = plot, width = 15, height = 10, units = "cm") # A4 format
+ggsave(filename = "TEMP.png", plot = plot, width = 15, height = 10, units = "cm") # A4 format
 ```
 
 
