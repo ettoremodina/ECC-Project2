@@ -64,7 +64,7 @@ edv
 /;
 
 *** newcode
-set n_w_rare_mat(n) /oceania, china, southafrica/
+set n_w_rare_mat(n) /oceania, china/
 
 *-------------------------------------------------------------------------------
 $elseif %phase%=='include_data'
@@ -383,7 +383,7 @@ K_EN.lo(jveh,t,n)$((year(t) gt 2015) and (not sameas (jveh,'trad_cars'))) = k_ve
 I_EN.lo(jveh_inv,t,n)$((year(t) le 2015) and (not sameas (jveh_inv,'trad_cars'))) = 1e-9;
 
 *** newcode 
-*I_EN.up('trad_cars',t,'europe')$(year(t) ge 2035) = 1e-2;
+I_EN.up('trad_cars',t,'europe')$(year(t) ge 2035) = 1e-2;
 *K_EN.up('trad_cars',t,'europe')$(year(t) ge 2045) = 50;
 ****
 
@@ -426,14 +426,14 @@ eqmcost_inv_hybrid_%clt%
 eqmcost_inv_plghybrid_%clt%
 eqmcost_inv_edv_%clt%
 *** newcode
-*eqq_inv_red_ban_%clt%
+eqq_inv_red_ban_%clt%
 ***
 *-------------------------------------------------------------------------------
 $elseif %phase%=='eqs'
 
 *** newcode
-*eqq_inv_red_ban_%clt%(t,n)$(mapn_th('%clt%') and (year(t) ge 2035))..
-*   I_EN('trad_cars',t,'usa') =l= 0.75*I_EN('trad_cars','6','usa');
+eqq_inv_red_ban_%clt%(t,n)$(mapn_th('%clt%') and (year(t) ge 2035))..
+   I_EN('trad_cars',t,'usa') =l= 0.75*I_EN('trad_cars','6','usa');
 
 
 ***
