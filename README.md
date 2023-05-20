@@ -2,21 +2,23 @@
 
 This is the README of the project of Energy Climate Change Modeling and scenarios Course (Academic Year 2022/2023).
 
-## How to navigate this Repository:
-
 The project was carried out using two programming languages: GAMS and R.
 
-all'interno vi è solo la cartella modules così è più veloce fare gli aggiornamenti
+## How to navigate this Repository:
 
-Per settare è necessario compiere i seguenti step:
-1) scaricare una versione di default di Witch e inserirla nella stessa cartella in cui c'è ECC-Project2.
-2) eliminare la cartella modules e data_witch17.
-3) aprire modules.gms e  sostituire la riga 6 con:
+Inside there is only the modules folder of the WITCH model so it's faster to do the updates.
+
+To set it is necessary to carry out the following steps:
+
+1) download a default version of Witch and place it in the same folder where ECC-Project2 is.
+
+2) delete the folder modules and data_witch17.
+
+3) open modules.gms and replace line 6 with:
 $set mp '../ECC-Project2/modules'.
-4) aprire run_witch17 e alla riga 27 sostituire con
+
+4) open run_witch17 and on line 27 replace with
 $setglobal datapath '../ECC-Project2/data_%datapathext%/'.
-  
-5) _**Presentation.pdf**_ : here it is the presentation of the project.
 
 
 ## Team members
